@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <BaseOutputPath>$(SolutionDir)..\target\svc\$(AssemblyName.ToLower().Replace(".service", "").Replace("jedi.", ""))</BaseOutputPath>
+    <BaseIntermediateOutputPath>\obj</BaseIntermediateOutputPath>
+    <StartupObject>Jedi.Region.Service.Program</StartupObject>
+  </PropertyGroup>
+
+</Project>
