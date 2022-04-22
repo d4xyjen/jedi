@@ -1,0 +1,20 @@
+authorization:
+  - authorization/**/*
+  
+backup:
+  - backup/**/*
+  
+gateway:
+  - gateway/**/*
+  
+region:
+  - region/**/*
+  
+game:
+  - game/**/*
+  
+persistence:
+  - persistence/**/*
+  
+sienna:
+  - sienna/**/*
