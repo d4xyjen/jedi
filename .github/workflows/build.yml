@@ -12,11 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
+    runs-on: windows-latest
     
     steps:
     - name: Checkout
@@ -44,13 +40,13 @@ jobs:
       if: ${{ always() }}
 
     - name: Publish
-      run: dotnet publish src/Jedi.sln --configuration Release --output build
+      run: dotnet publish src/Jedi.sln --configuration Release
       
     - name: Upload build artifact
       uses: actions/upload-artifact@v3.0.0
       with:
         name: Jedi
-        path: jedi/build/**
+        path: jedi/target/**
 
         if-no-files-found: ignore
         retention-days: 0
