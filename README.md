@@ -1,49 +1,69 @@
-## Welcome to the official Jedi repository
-Open-source, high performance .NET game services project for Fiesta Online. Built with modern architecture and practices in mind, Jedi offers players a refreshing and revamped gameplay experience, while also improving heavily on the core aspects of the game.
+<p align="center">
+  <img src="https://img.shields.io/github/license/dakaraic/jedi?style=flat-square" alt="GitHub"/>
+  <img src="https://img.shields.io/github/v/release/dakaraic/jedi?style=flat-square" alt="GitHub release (latest by date)"/>
+  <img src="https://img.shields.io/github/release-date/dakaraic/jedi?style=flat-square" alt="GitHub Release Date"/>
+  <img src="https://img.shields.io/github/contributors/dakaraic/jedi?style=flat-square" alt="GitHub contributors"/>
+  <img src="https://img.shields.io/github/issues/dakaraic/jedi?style=flat-square" alt="GitHub issues"/>
+  <img src="https://img.shields.io/github/issues-pr/dakaraic/jedi?style=flat-square" alt="GitHub pull requests"/>
+</p>
 
-![GitHub](https://img.shields.io/github/license/dakaraic/jedi?style=flat-square)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/dakaraic/jedi?style=flat-square)
-![GitHub Release Date](https://img.shields.io/github/release-date/dakaraic/jedi?style=flat-square)
-![GitHub contributors](https://img.shields.io/github/contributors/dakaraic/jedi?style=flat-square)
-![GitHub issues](https://img.shields.io/github/issues/dakaraic/jedi?style=flat-square)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/dakaraic/jedi?style=flat-square)
+## Overview
+Welcome to our official repository, home to Jedi's official source code, documentation, and releases.  
+<br/>
+Jedi is an open-source, high performance .NET game service project for Fiesta Online. Built with modern architecture and practices in mind, Jedi offers players a refreshing and revamped gameplay experience, while also improving heavily on the core aspects of the game.  
+<br/>
+Here are some useful links to help you get started:
+- [Join the Discord community](https://discord.gg/528mphj6Fd)
+- [Download the latest build](https://github.com/dakaraic/jedi/releases)
+- [Track current issues](https://github.com/dakaraic/jedi/issues)
+- [View official documentation](https://github.com/dakaraic/jedi/wiki)
 
-## Structure
+
+<br/>
+
+## Code Structure
 Jedi contains many game services, each handling a different set of business logic. The table below provides a brief description of what each service does and where its codebase is located.
 
-| Service | Description |
-| ---: | :--- |
+| Codebase | Description |
+| :---: | :---: |
 | [Sienna](https://github.com/dakaraic/jedi/tree/main/src/Sienna) | Responsible for the orchestration of all game services. |
-| [Authorization](https://github.com/dakaraic/jedi/tree/main/src/Authorization) | Authorizes game accounts and guards access to available [game regions](https://github.com/dakaraic/jedi/tree/main/src/Region). |
-| [Region](https://github.com/dakaraic/jedi/tree/main/src/Region) | Contains and manages partitioned [game](https://github.com/dakaraic/jedi/tree/main/src/Game) instances and its own cluster of [gateways](https://github.com/dakaraic/jedi/tree/main/src/Gateway). |
+| [Authorization](https://github.com/dakaraic/jedi/tree/main/src/Authorization) | Authorizes game accounts and guards access to available game regions. |
+| [Region](https://github.com/dakaraic/jedi/tree/main/src/Region) | Contains and manages partitioned game instances and its gateways. |
 | [Gateway](https://github.com/dakaraic/jedi/tree/main/src/Gateway) | Single replicable gateway that facilitates communication between players and the services in the game region. |
 | [Game](https://github.com/dakaraic/jedi/tree/main/src/Game) | Serves game data and handles all game logic. |
 | [Persistence](https://github.com/dakaraic/jedi/tree/main/src/Persistence) | Persists game data in a database. |
 | [Backup](https://github.com/dakaraic/jedi/tree/main/src/Backup) | Creates frequent backups of game data. |
 
-## Contributions
+<br/>
+
+## Contributing
 Jedi is open to contributions, but it's recommended that you first create an issue (if it's not already created) or let us know in the Discord server what you plan on working on so that we can mitigate conflicts.
 
 Get started by cloning the repository:
 ```
 git clone https://github.com/dakaraic/jedi.git
 cd jedi
-```
-  
+```  
+
+<br/>
+
 **Pull Requests**  
 
-When making changes to the codebase, be sure to first create a branch that you'll be working on. Once you're done with your changes, open up a pull request to have your changes merged into the main branch.
+If you'd like to make some changes to the , be sure to first create a branch for your work. Once you're done with your changes, open up a pull request to have your changes merged into the main branch.
 
-Note: You'll need a code review and approval before your changes are merged into the main branch. You can request reviews [in our Discord server](https://discordapp.com/channels/966409323817361520/966435732380086302) 
-  
-  
+Note: You'll need a code review and approval before your changes are merged into the main branch. You can request reviews in the [#reviews](https://discordapp.com/channels/966409323817361520/966435732380086302) channel in our Discord server.
+
+<br/>
+
 **Conventional Commits**  
 
-We use conventional commits to help us automate releases for the services. If your commit messages follow any other format, **they will fail the required check**. If you're not familiar with conventional commits, here's a [page where you can learn more about them and all of their benefits](https://www.conventionalcommits.org/en/v1.0.0/).
+We use conventional commits to help us automate releases for the services. Here's a page where you can learn more about [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) and all of their great benefits.
+
+<br/>
 
 **Copyright and license information for new files**  
 
-We prefer all new files created in the Jedi codebase to begin with the following copyright notice:
+We prefer that all new files created in the Jedi codebase begin with the following copyright notice:
 ```
 // <copyright file="$safeitemrootname$.cs" company="Jedi Developers">
 // Copyright (c) Jedi Developers. All rights reserved.
@@ -53,5 +73,6 @@ We prefer all new files created in the Jedi codebase to begin with the following
 // </copyright>
 ```
 
-### Need help?
-If you need help making changes to the codebase, don't hesitate to reach out in [our help channel on Discord](https://discord.com/channels/966409323817361520/966445867517227042).
+<br/>
+
+If you need help making changes to the codebase, don't hesitate to reach out in the [#help](https://discord.com/channels/966409323817361520/966445867517227042) channel in our Discord server.
