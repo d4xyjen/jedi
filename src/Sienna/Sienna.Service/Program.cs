@@ -10,6 +10,7 @@ namespace Jedi.Sienna.Service
     {
         private static void Main(string[] args)
         {
+            Console.WriteLine("Hello from Sienna!");
         }
     }
 }
