@@ -1,20 +1,26 @@
+repo:
+  - any: ['*', '!src/**/*']
+
 authorization:
-  - authorization/**/*
+  - any: ['src/Authentication/**/*']
   
 backup:
-  - backup/**/*
-  
-gateway:
-  - gateway/**/*
-  
-region:
-  - region/**/*
-  
+  - any: ['src/Backup/**/*']
+
+common:
+  - any: ['src/Common/**/*']
+
 game:
-  - game/**/*
-  
+  - any: ['src/Game/**/*']
+
+gateway:
+  - any: ['src/Gateway/**/*']
+
 persistence:
-  - persistence/**/*
-  
+  - any: ['src/Persistence/**/*']
+
+region:
+  - any: ['src/Region/**/*']
+
 sienna:
-  - sienna/**/*
+  - any: ['src/Sienna/**/*']
