@@ -1,4 +1,4 @@
-name: CI Build
+name: Jedi CI Build
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  Jedi:
+  Build:
     runs-on: windows-latest
     
     steps:
