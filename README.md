@@ -1,7 +1,7 @@
 # jedi
 Open-source, high performance .NET game services for Fiesta Online.
 
-# Structure
+## Structure
 Jedi contains many game services, each handling a different set of business logic. The table below provides a brief description of what each service does and where its codebase is located.
 
 | Service | Description |
