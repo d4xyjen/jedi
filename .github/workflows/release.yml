@@ -1,0 +1,49 @@
+name: Build, Test, and Release
+
+on:
+  push:
+    paths:
+      - "src/**"
+    branches: [ main ]
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore src/Jedi.sln
+      
+    - name: Build
+      run: dotnet build src/Jedi.sln --configuration Release --no-restore
+      
+    - name: Test
+      run: dotnet test src/Jedi.sln --configuration Release --no-build --verbosity normal --logger trx --results-directory results
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: Test Results
+        path: results
+      if: ${{ always() }}
+        
+    - uses: paulhatch/semantic-version@v4.0.2
+      with:
+        tag_prefix: "v"
+        major_pattern: "(MAJOR)"
+        minor_pattern: "(MINOR)"
+        format: "${major}.${minor}.${patch}-prerelease${increment}"
+        namespace: jedi
+        bump_each_commit: false
+        search_commit_body: false
+        user_format_type: "json"
