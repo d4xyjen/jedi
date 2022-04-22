@@ -1,0 +1,49 @@
+name: Development Build
+
+on:
+  push:
+    branches: [ main ]
+    tags-ignore:
+      - "*"
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore src/Jedi.sln
+      
+    - name: Build
+      run: dotnet build src/Jedi.sln --configuration Release --no-restore
+      
+    - name: Test
+      run: dotnet test src/Jedi.sln --configuration Release --no-build --verbosity normal --logger trx
+        
+    - name: Zip
+      uses: TheDoctor0/zip-release@0.6.2
+      with:
+        filename: Jedi.zip
+        path: ./release
+        directory: ./target
+        
+    - name: Release
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build"
+        files: |
+          Jedi.zip
+          LICENSE
