@@ -29,14 +29,11 @@ jobs:
       
     - name: Test
       run: dotnet test src/Jedi.sln --configuration Release --no-build --verbosity normal --logger trx
-      
-    - name: Publish
-      run: dotnet publish src/Jedi.sln --configuration Release --output release
         
     - name: Zip
       uses: montudor/action-zip@v1.0.0
       with:
-        args: zip -qq -r Jedi.zip release
+        args: zip -qq -r Jedi.zip target
         
     - name: Release
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -44,7 +41,7 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: "Development Build"
+        title: "Development Build Pre-Release"
         files: |
           Jedi.zip
           LICENSE
