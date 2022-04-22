@@ -48,7 +48,7 @@ We prefer all new files created in the Jedi codebase to begin with the following
 // <copyright file="$safeitemrootname$.cs" company="Jedi Developers">
 // Copyright (c) Jedi Developers. All rights reserved.
 //  
-// This software is licensed under the MIT license. Read the LICENSE.txt file in the 
+// This software is licensed under the MIT license. Read the LICENSE file in the 
 // repository for more information.
 // </copyright>
 ```
