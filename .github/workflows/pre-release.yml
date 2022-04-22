@@ -25,10 +25,13 @@ jobs:
       run: dotnet restore src/Jedi.sln
       
     - name: Build
-      run: dotnet build src/Jedi.sln --configuration Release --no-restore --output release
+      run: dotnet build src/Jedi.sln --configuration Release --no-restore
       
     - name: Test
       run: dotnet test src/Jedi.sln --configuration Release --no-build --verbosity normal --logger trx
+      
+    - name: Publish
+      run: dotnet publish src/Jedi.sln --configuration Release --output release
         
     - name: Zip
       uses: montudor/action-zip@v1.0.0
