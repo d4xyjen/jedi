@@ -11,5 +11,5 @@ Jedi contains many game services, each handling a different set of business logi
 | [Region](https://github.com/dakaraic/jedi/tree/main/src/Region) | Contains and manages partitioned [game](https://github.com/dakaraic/jedi/tree/main/src/Game) instances and its own cluster of [gateways](https://github.com/dakaraic/jedi/tree/main/src/Gateway). |
 | [Gateway](https://github.com/dakaraic/jedi/tree/main/src/Gateway) | Single replicable gateway that facilitates communication between players and the services in the game region. |
 | [Game](https://github.com/dakaraic/jedi/tree/main/src/Game) | Serves game data and handles all game logic. |
-| [Persistence](https://github.com/dakaraic/jedi/tree/main/src/Persistence) | Persists game data using a SQL database. |
+| [Persistence](https://github.com/dakaraic/jedi/tree/main/src/Persistence) | Persists game data in a database. |
 | [Backup](https://github.com/dakaraic/jedi/tree/main/src/Backup) | Creates frequent backups of game data. |
