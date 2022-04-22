@@ -51,15 +51,15 @@ cd jedi
 
 **Pull Requests**  
 
-If you'd like to make some changes to the , be sure to first create a branch for your work. Once you're done with your changes, open up a pull request to have your changes merged into the main branch.
+All changes in the repository happen through pull requests, where your changes are reviewed and merged into the main branch. We actively invite you to submit your pull requests [here](https://github.com/dakaraic/jedi/pulls).
 
-Note: You'll need a code review and approval before your changes are merged into the main branch. You can request reviews in the [#reviews](https://discordapp.com/channels/966409323817361520/966435732380086302) channel in our Discord server.
+You can request reviews in the [#reviews](https://discordapp.com/channels/966409323817361520/966435732380086302) channel in our Discord server.
 
 <br/>
 
 **Conventional Commits**  
 
-We use conventional commits to help us automate releases for the services. Here's a page where you can learn more about [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) and all of their great benefits.
+We use conventional commits to help us automate releases for the services. Please make sure your commit messages are standardized. Here's a page where you can learn more about the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) standard and its benefits.
 
 <br/>
 
