@@ -7,7 +7,7 @@ on:
       - "*"
 
 jobs:
-  release:
+  pre_release:
     runs-on: windows-latest
     
     steps:
@@ -34,8 +34,8 @@ jobs:
       uses: TheDoctor0/zip-release@0.6.2
       with:
         filename: Jedi.zip
-        path: ./release
-        directory: ./target
+        path: ./target
+        directory: ./release
         
     - name: Release
       uses: "marvinpinto/action-automatic-releases@latest"
