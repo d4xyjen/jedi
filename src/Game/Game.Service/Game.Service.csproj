@@ -8,7 +8,7 @@
     <BaseOutputPath>$(SolutionDir)..\target\svc\$(AssemblyName.ToLower().Replace(".service", "").Replace("jedi.", ""))</BaseOutputPath>
     <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <BaseIntermediateOutputPath>\obj</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
     <StartupObject>Jedi.Game.Service.Program</StartupObject>
   </PropertyGroup>
 
