@@ -31,7 +31,7 @@ Jedi contains many game services, each handling a different set of business logi
 | [Sienna](https://github.com/dakaraic/jedi/tree/main/src/Sienna) | Responsible for the orchestration of all game services. |
 | [Authorization](https://github.com/dakaraic/jedi/tree/main/src/Authorization) | Authorizes game accounts and guards access to available game regions. |
 | [Region](https://github.com/dakaraic/jedi/tree/main/src/Region) | Contains and manages partitioned game instances and its gateways. |
-| [Gateway](https://github.com/dakaraic/jedi/tree/main/src/Gateway) | Single replicable gateway that facilitates communication between players and the services in the game region. |
+| [Gateway](https://github.com/dakaraic/jedi/tree/main/src/Gateway) | Gateway owned by a region that facilitates communication between players and the services region's game services. |
 | [Game](https://github.com/dakaraic/jedi/tree/main/src/Game) | Serves game data and handles all game logic. |
 | [Persistence](https://github.com/dakaraic/jedi/tree/main/src/Persistence) | Persists game data in a database. |
 | [Backup](https://github.com/dakaraic/jedi/tree/main/src/Backup) | Creates frequent backups of game data. |
