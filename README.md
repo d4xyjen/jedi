@@ -7,6 +7,8 @@
   <img src="https://img.shields.io/github/issues-pr/dakaraic/jedi?style=flat-square" alt="GitHub pull requests"/>
 </p>
 
+<br/>
+
 ## Overview
 Welcome to our official repository, home to Jedi's official source code, documentation, and releases.  
 <br/>
