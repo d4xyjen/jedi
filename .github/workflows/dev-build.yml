@@ -41,7 +41,7 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
-        title: "Development Build Pre-Release"
+        title: "Current Development Build"
         files: |
           Jedi.zip
           LICENSE
