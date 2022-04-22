@@ -1,7 +1,7 @@
-# jedi
-Open-source, high performance .NET game services for Fiesta Online.
+# Overview
+Open-source, high performance .NET game services for Fiesta Online. Built using modern architecture and practices, Jedi offers players a refreshed and revamped gameplay experience, while also improving on the core aspects of the game.
 
-### Copyright notice for new files
+## Copyright notice for new files
 We prefer all new files created in the Jedi codebase to begin with the following copyright notice:
 ```
 // <copyright file="Program.cs" company="Jedi Developers">
