@@ -1,4 +1,4 @@
-name: CI
+name: CI Build
 
 on:
   push:
@@ -9,9 +9,6 @@ on:
 jobs:
   Build:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        dotnet-version: [ '6.0.x' ]
     
     steps:
     - name: Checkout
@@ -20,7 +17,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: ${{ matrix.dotnet-version }}
+        dotnet-version: '6.0.x'
         
     - name: Restore dependencies
       run: dotnet restore src/Jedi.sln
