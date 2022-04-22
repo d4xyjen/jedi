@@ -7,10 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  Build:
     runs-on: windows-latest
-
+    strategy:
+      matrix:
+        dotnet-version: [ '6.0.x' ]
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -18,16 +20,23 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: ${{ matrix.dotnet-version }}
         
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore **/*.csproj
       
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build **/*.sln --configuration Release --no-restore
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test **/*tests.csproj --configuration Release --no-build --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: dotnet-${{ matrix.dotnet-version }}-tests
+        path: TestResults-${{ matrix.dotnet-version }}
+      if: ${{ always() }}
 
     - name: First pull request
       uses: actions/first-interaction@v1.1.0
