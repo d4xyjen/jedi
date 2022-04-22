@@ -23,13 +23,13 @@ jobs:
         dotnet-version: ${{ matrix.dotnet-version }}
         
     - name: Restore dependencies
-      run: dotnet restore **/*.csproj
+      run: dotnet restore src/**/*.csproj
       
     - name: Build
-      run: dotnet build **/*.sln --configuration Release --no-restore
+      run: dotnet build src/**/*.sln --configuration Release --no-restore
       
     - name: Test
-      run: dotnet test **/*tests.csproj --configuration Release --no-build --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+      run: dotnet test src/**/*tests.csproj --configuration Release --no-build --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
       
     - name: Upload test results
       uses: actions/upload-artifact@v3
