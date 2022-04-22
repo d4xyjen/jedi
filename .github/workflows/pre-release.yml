@@ -30,12 +30,10 @@ jobs:
     - name: Test
       run: dotnet test src/Jedi.sln --configuration Release --no-build --verbosity normal --logger trx
         
-    - name: Zip
-      uses: TheDoctor0/zip-release@0.6.2
+    - name: action-zip
+      uses: montudor/action-zip@v1.0.0
       with:
-        filename: Jedi.zip
-        path: ./target
-        directory: ./release
+        args: zip -qq -r Jedi.zip target
         
     - name: Release
       uses: "marvinpinto/action-automatic-releases@latest"
