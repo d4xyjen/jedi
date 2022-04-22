@@ -27,7 +27,7 @@ Here are some useful links to help you get started:
 Jedi contains many game services, each handling a different set of business logic. The table below provides a brief description of what each service does and where its codebase is located.
 
 | Codebase | Description |
-| :---: | :---: |
+| :--- | :--- |
 | [Sienna](https://github.com/dakaraic/jedi/tree/main/src/Sienna) | Responsible for the orchestration of all game services. |
 | [Authorization](https://github.com/dakaraic/jedi/tree/main/src/Authorization) | Authorizes game accounts and guards access to available game regions. |
 | [Region](https://github.com/dakaraic/jedi/tree/main/src/Region) | Contains and manages partitioned game instances and its gateways. |
