@@ -1,5 +1,5 @@
-## Overview
-Open-source, high performance .NET game services for Fiesta Online. Built with modern architecture and practices in mind, Jedi offers players a refreshed and revamped gameplay experience, while also improving on the core aspects of the game.
+## Welcome to the Jedi Repository
+Open-source, high performance .NET game services project for Fiesta Online. Built with modern architecture and practices in mind, Jedi offers players a refreshing and revamped gameplay experience, while also improving heavily on the core aspects of the game.
 
 ![GitHub](https://img.shields.io/github/license/dakaraic/jedi?style=flat-square)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/dakaraic/jedi?style=flat-square)
