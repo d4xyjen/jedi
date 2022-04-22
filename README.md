@@ -1,6 +1,17 @@
 # jedi
 Open-source, high performance .NET game services for Fiesta Online.
 
+### Copyright notice for new files
+We prefer all new files created in the Jedi codebase to begin with the following copyright notice:
+```
+// <copyright file="Program.cs" company="Jedi Developers">
+// Copyright (c) Jedi Developers. All rights reserved.
+//  
+// This software is licensed under the MIT license. Read the LICENSE.txt file in the 
+// repository for more information.
+// </copyright>
+```
+
 ## Structure
 Jedi contains many game services, each handling a different set of business logic. The table below provides a brief description of what each service does and where its codebase is located.
 
