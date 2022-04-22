@@ -29,6 +29,13 @@ jobs:
       
     - name: Test
       run: dotnet test src/Jedi.sln --configuration Release --no-build --verbosity normal --logger trx
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: Test Results
+        path: results
+      if: ${{ always() }}
         
     - name: Zip
       uses: montudor/action-zip@v1.0.0
