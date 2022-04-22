@@ -42,3 +42,15 @@ jobs:
         name: dotnet-${{ matrix.dotnet-version }}-tests
         path: TestResults-${{ matrix.dotnet-version }}
       if: ${{ always() }}
+
+    - name: Publish
+      run: dotnet publish src/Jedi.sln --configuration Release --output build
+      
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: Jedi
+        path: jedi/build/**
+
+        if-no-files-found: ignore
+        retention-days: 0
