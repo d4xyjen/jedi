@@ -2,8 +2,6 @@ name: Release
 
 on:
   push:
-    paths:
-      - "src/**"
     branches: [ main ]
 
 jobs:
@@ -16,13 +14,12 @@ jobs:
       with:
         fetch-depth: 0
         
-    - name: Git Semantic Version
-      uses: PaulHatch/semantic-version@v5.0.0-alpha2
+    - uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        branch: HEAD
-        major_pattern: (MAJOR)
-        minor_pattern: (MINOR)
-        version_format: ${major}.${minor}.${patch}
-        bump_each_commit: false
-        search_commit_body: false
-        user_format_type: json
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Jedi"
+        files: |
+          LICENSE.txt
+          *.jar
