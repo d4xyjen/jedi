@@ -17,7 +17,7 @@ Jedi is an open-source, high performance .NET game service project for Fiesta On
 Here are some useful links to help you get started:
 - [Join the Discord community](https://discord.gg/528mphj6Fd)
 - [Download the latest build](https://github.com/dakaraic/jedi/releases)
-- [Track current issues](https://github.com/dakaraic/jedi/issues)
+- [Track current issues](https://github.com/users/dakaraic/projects/1/views/1)
 - [View official documentation](https://github.com/dakaraic/jedi/wiki)
 
 
