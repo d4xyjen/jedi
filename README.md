@@ -39,7 +39,8 @@ Jedi contains many game services, each handling a different set of business logi
 <br/>
 
 ## Contributing
-Jedi is open to contributions, but it's recommended that you first create an issue (if it's not already created) or let us know in the Discord server what you plan on working on so that we can mitigate conflicts.
+Jedi is open to contributions, but it's recommended that you first create an issue (if it's not already created).
+You can view a list of current issues on the project page [here](https://github.com/users/dakaraic/projects/1/views/1).
 
 Get started by cloning the repository:
 ```
@@ -53,7 +54,8 @@ cd jedi
 
 All changes in the repository happen through pull requests, where your changes are reviewed and merged into the main branch. We actively invite you to submit your pull requests [here](https://github.com/dakaraic/jedi/pulls).
 
-You can request reviews in the [#reviews](https://discordapp.com/channels/966409323817361520/966435732380086302) channel in our Discord server.
+After creating your pull request, add it to our project page's "Please Review" page [here](https://github.com/users/dakaraic/projects/1/views/3).
+You can also request reviews in the [#reviews](https://discordapp.com/channels/966409323817361520/966435732380086302) channel in our Discord server.
 
 <br/>
 
