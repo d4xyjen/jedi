@@ -67,8 +67,8 @@ We use conventional commits to help us automate releases for the services. Pleas
 
 We prefer that all new files created in the Jedi codebase begin with the following copyright notice:
 ```
-// <copyright file="$safeitemrootname$.cs" company="Jedi Developers">
-// Copyright (c) Jedi Developers. All rights reserved.
+// <copyright file="$safeitemrootname$.cs" company="Jedi Contributors">
+// Copyright (c) Jedi Contributors. All rights reserved.
 //  
 // This software is licensed under the MIT license. Read the LICENSE file in the 
 // repository for more information.
