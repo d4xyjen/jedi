@@ -1,12 +1,6 @@
 repo:
   - any: ['*', '!src/**/*']
 
-authorization:
-  - any: ['src/Authentication/**/*']
-  
-backup:
-  - any: ['src/Backup/**/*']
-
 common:
   - any: ['src/Common/**/*']
   
@@ -18,6 +12,12 @@ threading:
   
 services:
   - any: ['src/Common/Common.Services/**/*']
+
+authorization:
+  - any: ['src/Authentication/**/*']
+  
+backup:
+  - any: ['src/Backup/**/*']
 
 game:
   - any: ['src/Game/**/*']
