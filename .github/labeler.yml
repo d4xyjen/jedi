@@ -9,6 +9,15 @@ backup:
 
 common:
   - any: ['src/Common/**/*']
+  
+logging:
+  - any: ['src/Common/Common.Logging/**/*']
+  
+threading:
+  - any: ['src/Common/Common.Threading/**/*']
+  
+services:
+  - any: ['src/Common/Common.Services/**/*']
 
 game:
   - any: ['src/Game/**/*']
