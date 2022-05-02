@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <BaseOutputPath>$(SolutionDir)..\target\svc\$(AssemblyName.ToLower().Replace(".service", "").Replace("jedi.", ""))</BaseOutputPath>
+    <BaseOutputPath>$(SolutionDir)..\target\service\$(AssemblyName)</BaseOutputPath>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
     <StartupObject>Jedi.Backup.Service.Program</StartupObject>
   </PropertyGroup>

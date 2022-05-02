@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-    <BaseOutputPath>$(SolutionDir)..\target\lib\$(AssemblyName.ToLower().Replace("jedi.", ""))</BaseOutputPath>
+    <BaseOutputPath>$(SolutionDir)..\target\lib\$(AssemblyName)</BaseOutputPath>
   </PropertyGroup>
 
 </Project>
