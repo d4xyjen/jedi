@@ -5,9 +5,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <BaseOutputPath>$(SolutionDir)..\target\service\$(AssemblyName)</BaseOutputPath>
-    <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
+	  <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+	<BaseOutputPath>$(SolutionDir)..\target\service\$(AssemblyName)</BaseOutputPath>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
     <StartupObject>Jedi.Game.Service.Program</StartupObject>
   </PropertyGroup>
