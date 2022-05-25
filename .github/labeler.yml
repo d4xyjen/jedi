@@ -1,35 +1,26 @@
-repo:
+Repo:
   - any: ['*', '!src/**/*']
 
-common:
+Common:
   - any: ['src/Common/**/*']
+ 
+Authorization:
+  - any: ['src/Authorization/**/*']
   
-logging:
-  - any: ['src/Common/Common.Logging/**/*']
-  
-threading:
-  - any: ['src/Common/Common.Threading/**/*']
-  
-services:
-  - any: ['src/Common/Common.Services/**/*']
-
-authorization:
-  - any: ['src/Authentication/**/*']
-  
-backup:
+Backup:
   - any: ['src/Backup/**/*']
 
-game:
+Game:
   - any: ['src/Game/**/*']
 
-gateway:
+Gateway:
   - any: ['src/Gateway/**/*']
 
-persistence:
+Persistence:
   - any: ['src/Persistence/**/*']
 
-region:
+Region:
   - any: ['src/Region/**/*']
 
-sienna:
-  - any: ['src/Sienna/**/*']
+Grogu:
+  - any: ['src/Grogu/**/*']
