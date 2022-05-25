@@ -10,7 +10,7 @@
 <br/>
 
 ## Overview
-Welcome to our official repository, home to Jedi's official source code, documentation, and releases.  
+Welcome to Jedi's official repository, home to source code, documentation, and releases.  
 <br/>
 Jedi is an open-source, high performance .NET game service project for Fiesta Online. Built with modern architecture and practices in mind, Jedi offers players a refreshing and revamped gameplay experience, while also improving heavily on the core aspects of the game.  
 <br/>
@@ -28,7 +28,7 @@ Jedi contains many game services, each handling a different set of business logi
 
 | Codebase | Description |
 | :--- | :--- |
-| [Sienna](https://github.com/dakaraic/jedi/tree/main/src/Sienna) | Responsible for the orchestration of all game services. |
+| [Grogu](https://github.com/dakaraic/jedi/tree/main/src/Grogu) | Responsible for the orchestration of all game services. |
 | [Authorization](https://github.com/dakaraic/jedi/tree/main/src/Authorization) | Authorizes game accounts and guards access to available game regions. |
 | [Region](https://github.com/dakaraic/jedi/tree/main/src/Region) | Contains and manages partitioned game instances and its gateways. |
 | [Gateway](https://github.com/dakaraic/jedi/tree/main/src/Gateway) | Gateway owned by a region that facilitates communication between players and the services region's game services. |
