@@ -1,20 +1,20 @@
-Repo:
+repo:
   - any: ['*', '!src/**/*']
 
-Common:
+common:
   - any: ['src/Common/**/*']
  
-Authorization:
+authorization:
   - any: ['src/Authorization/**/*']
 
-World:
+world:
   - any: ['src/World/**/*']
 
-Zone:
+zone:
   - any: ['src/Zone/**/*']
 
-Game:
+game:
   - any: ['src/Game/**/*']
 
-Datastore:
+datastore:
   - any: ['src/Datastore/**/*']
