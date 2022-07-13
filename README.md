@@ -1,14 +1,3 @@
-<p align="center">
-  <img src="https://img.shields.io/github/license/dakaraic/jedi?style=flat-square" alt="GitHub"/>
-  <img src="https://img.shields.io/github/v/release/dakaraic/jedi?style=flat-square" alt="GitHub release (latest by date)"/>
-  <img src="https://img.shields.io/github/release-date/dakaraic/jedi?style=flat-square" alt="GitHub Release Date"/>
-  <img src="https://img.shields.io/github/contributors/dakaraic/jedi?style=flat-square" alt="GitHub contributors"/>
-  <img src="https://img.shields.io/github/issues/dakaraic/jedi?style=flat-square" alt="GitHub issues"/>
-  <img src="https://img.shields.io/github/issues-pr/dakaraic/jedi?style=flat-square" alt="GitHub pull requests"/>
-</p>
-
-<br/>
-
 ## Overview
 Welcome to Jedi's official repository, home to source code, documentation, and releases.  
 <br/>
@@ -28,13 +17,12 @@ Jedi contains many game services, each handling a different set of business logi
 
 | Codebase | Description |
 | :--- | :--- |
-| [Grogu](https://github.com/dakaraic/jedi/tree/main/src/Grogu) | Responsible for the orchestration of all game services. |
-| [Authorization](https://github.com/dakaraic/jedi/tree/main/src/Authorization) | Authorizes game accounts and guards access to available game regions. |
-| [Region](https://github.com/dakaraic/jedi/tree/main/src/Region) | Contains and manages partitioned game instances and its gateways. |
-| [Gateway](https://github.com/dakaraic/jedi/tree/main/src/Gateway) | Gateway owned by a region that facilitates communication between players and the services region's game services. |
-| [Game](https://github.com/dakaraic/jedi/tree/main/src/Game) | Serves game data and handles all game logic. |
-| [Persistence](https://github.com/dakaraic/jedi/tree/main/src/Persistence) | Persists game data in a database. |
-| [Backup](https://github.com/dakaraic/jedi/tree/main/src/Backup) | Creates frequent backups of game data. |
+| [Authorization](https://github.com/dakaraic/jedi/tree/main/src/Authorization) | Authorizes accounts and guards access to available worlds. |
+| [Common](https://github.com/dakaraic/jedi/tree/main/src/Common) | Library of common code shared amongst the services. |
+| [Datastore](https://github.com/dakaraic/jedi/tree/main/src/Datastore) | Stores, retrieves, and backs up game data. |
+| [Game](https://github.com/dakaraic/jedi/tree/main/src/Game) | Runs zone-partitioned instances of the game. |
+| [World](https://github.com/dakaraic/jedi/tree/main/src/World) | Orchestrates communication with zone services. |
+| [Zone](https://github.com/dakaraic/jedi/tree/main/src/Zone) | Load balancer for communication with game services. |
 
 <br/>
 
