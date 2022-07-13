@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Zone.EntryPoint-C8309522-D04D-497E-98F0-8B3736817094</UserSecretsId>
+    <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <BaseOutputPath>$(SolutionDir)..\target\service\$(AssemblyName)</BaseOutputPath>
+    <StartupObject>Jedi.Zone.EntryPoint.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.Startup\Common.Startup.csproj" />
+  </ItemGroup>
+</Project>

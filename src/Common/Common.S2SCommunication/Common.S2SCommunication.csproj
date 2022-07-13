@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <BaseOutputPath>$(SolutionDir)..\target\lib\$(AssemblyName)</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Authorization\Authorization.Contracts\Authorization.Contracts.csproj" />
+    <ProjectReference Include="..\..\Datastore\Datastore.Contracts\Datastore.Contracts.csproj" />
+    <ProjectReference Include="..\..\Game\Game.Contracts\Game.Contracts.csproj" />
+    <ProjectReference Include="..\..\World\World.Contracts\World.Contracts.csproj" />
+    <ProjectReference Include="..\..\Zone\Zone.Contracts\Zone.Contracts.csproj" />
+    <ProjectReference Include="..\Common.Api\Common.Api.csproj" />
+  </ItemGroup>
+
+</Project>

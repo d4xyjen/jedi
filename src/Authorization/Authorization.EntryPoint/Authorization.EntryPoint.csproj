@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Authorization.EntryPoint-98893B5F-A610-4E84-89B8-A578C687FA48</UserSecretsId>
+    <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <StartupObject>Jedi.Authorization.EntryPoint.Program</StartupObject>
+    <BaseOutputPath>$(SolutionDir)..\target\service\$(AssemblyName)</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Common.S2SCommunication\Common.S2SCommunication.csproj" />
+    <ProjectReference Include="..\..\Common\Common.Startup\Common.Startup.csproj" />
+    <ProjectReference Include="..\..\Game\Game.Contracts\Game.Contracts.csproj" />
+  </ItemGroup>
+</Project>
