@@ -6,21 +6,15 @@ Common:
  
 Authorization:
   - any: ['src/Authorization/**/*']
-  
-Backup:
-  - any: ['src/Backup/**/*']
+
+World:
+  - any: ['src/World/**/*']
+
+Zone:
+  - any: ['src/Zone/**/*']
 
 Game:
   - any: ['src/Game/**/*']
 
-Gateway:
-  - any: ['src/Gateway/**/*']
-
-Persistence:
-  - any: ['src/Persistence/**/*']
-
-Region:
-  - any: ['src/Region/**/*']
-
-Grogu:
-  - any: ['src/Grogu/**/*']
+Datastore:
+  - any: ['src/Datastore/**/*']
