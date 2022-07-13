@@ -8,7 +8,6 @@
 </p>
 
 <br/>
-
 ## Overview
 Welcome to Jedi's official repository, home to source code, documentation, and releases.  
 <br/>
