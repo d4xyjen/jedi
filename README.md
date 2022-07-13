@@ -1,14 +1,3 @@
-<p align="center">
-  <img src="https://img.shields.io/github/license/dakaraic/jedi?style=flat-square" alt="GitHub"/>
-  <img src="https://img.shields.io/github/v/release/dakaraic/jedi?style=flat-square" alt="GitHub release (latest by date)"/>
-  <img src="https://img.shields.io/github/release-date/dakaraic/jedi?style=flat-square" alt="GitHub Release Date"/>
-  <img src="https://img.shields.io/github/contributors/dakaraic/jedi?style=flat-square" alt="GitHub contributors"/>
-  <img src="https://img.shields.io/github/issues/dakaraic/jedi?style=flat-square" alt="GitHub issues"/>
-  <img src="https://img.shields.io/github/issues-pr/dakaraic/jedi?style=flat-square" alt="GitHub pull requests"/>
-</p>
-
-<br/>
-
 ## Overview
 Welcome to Jedi's official repository, home to source code, documentation, and releases.  
 <br/>
