@@ -1,7 +1,7 @@
 ## Overview
 Welcome to Jedi's official repository, home to source code, documentation, and releases.  
 <br/>
-Jedi is an open-source, high performance .NET game service project for Fiesta Online aimed at improving the core aspects of the game while also allowing developers to easily expand its capabilities.  
+Jedi is a .NET game service project for Fiesta Online aimed at improving the core aspects of the game while also allowing developers to easily expand its capabilities.  
 <br/>
 Here are some useful links to help you get started:
 - [Join the Discord community](https://discord.gg/528mphj6Fd)
