@@ -91,7 +91,7 @@ namespace Jedi.Common.Api
                     continue;
                 }
 
-                var propertyValue = property.PropertyType == typeof(string) ? string.Empty : Activator.CreateInstance(property.PropertyType);
+                var propertyValue = GetDefaultValue(property);
                 if (propertyValue == null)
                 {
                     continue;
@@ -110,6 +110,23 @@ namespace Jedi.Common.Api
 
             return obj as Protocol;
         }
+
+        private object? GetDefaultValue(PropertyInfo property)
+        {
+            if (property.PropertyType == typeof(string))
+            {
+                return string.Empty;
+            }
+            else if (property.PropertyType == typeof(byte[]))
+            {
+                return Array.Empty<byte>();
+            }
+            else
+            {
+                return Activator.CreateInstance(property.PropertyType);
+            }
+        }
+
 
         private void Serialize(object obj, PropertyInfo propertyInfo)
         {

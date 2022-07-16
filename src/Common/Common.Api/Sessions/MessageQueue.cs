@@ -5,7 +5,6 @@
 // repository for more information.
 // </copyright>
 
-using Jedi.Common.Api.Extensions;
 using Jedi.Common.Core;
 
 namespace Jedi.Common.Api.Sessions

@@ -12,13 +12,9 @@ namespace Jedi.Common.Contracts.Protocols.User
     public class PROTO_USER_CLIENT_RIGHTVERSION_CHECK_ACK : Protocol
     {
         /// <summary>
-        /// The length of the XTrap key.
-        /// </summary>
-        public byte XTrapKeyLength { get; set; }
-
-        /// <summary>
         /// The XTrap key.
         /// </summary>
+        [PrefixLength]
         public byte[] XTrapKey { get; set; }
 
         /// <summary>
@@ -31,11 +27,9 @@ namespace Jedi.Common.Contracts.Protocols.User
         /// <summary>
         /// Create a new <see cref="PROTO_USER_CLIENT_RIGHTVERSION_CHECK_ACK"/>.
         /// </summary>
-        /// <param name="xtrapKeyLength">The length of the XTrap key.</param>
-        /// <param name="xtrapKey">The XTrap key.</param>
-        public PROTO_USER_CLIENT_RIGHTVERSION_CHECK_ACK(byte xtrapKeyLength, byte[] xtrapKey)
+        /// <param name="xtrapKey">The authorization service's XTrap key.</param>
+        public PROTO_USER_CLIENT_RIGHTVERSION_CHECK_ACK(byte[] xtrapKey)
         {
-            XTrapKeyLength = xtrapKeyLength;
             XTrapKey = xtrapKey;
         }
     }

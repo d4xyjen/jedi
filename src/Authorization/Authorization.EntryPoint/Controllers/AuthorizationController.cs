@@ -75,7 +75,7 @@ namespace Jedi.Authorization.EntryPoint.Controllers
         [ProtocolHandler(ProtocolType.USER_CLIENT_VERSION_CHECK_REQ)]
         public void USER_CLIENT_VERSION_CHECK_REQ(Guid sessionId, [FromBody] PROTO_USER_CLIENT_VERSION_CHECK_REQ protocol)
         {
-            _logger.LogInformation("AuthorizationController: Session requesting client version check; Session: {Session}, Version: {Version}", sessionId, protocol.Version);
+            _logger.LogInformation("AuthorizationController: User requesting client version check; Session: {Session}, Version: {Version}", sessionId, protocol.Version);
 
             if (!_sessionFactory.GetSession(sessionId, out var session) || session == null)
             {
@@ -95,14 +95,36 @@ namespace Jedi.Authorization.EntryPoint.Controllers
                 var supportedVersion = supportedVersions[i];
                 if (protocol.Version.Equals(supportedVersion))
                 {
-                    _logger.LogInformation("AuthorizationController: Client version is supported; Session: {Session}, Version: {Version}", session.Id, protocol.Version);
-                    session.Send(ProtocolType.USER_CLIENT_RIGHTVERSION_CHECK_ACK, new PROTO_USER_CLIENT_RIGHTVERSION_CHECK_ACK((byte) XTrapKey.Length, XTrapKey));
+                    _logger.LogInformation("AuthorizationController: User client version supported; Session: {Session}, Version: {Version}", session.Id, protocol.Version);
+                    session.Send(ProtocolType.USER_CLIENT_RIGHTVERSION_CHECK_ACK, new PROTO_USER_CLIENT_RIGHTVERSION_CHECK_ACK(XTrapKey));
                     return;
                 }
             }
 
-            _logger.LogWarning("AuthorizationController: Client version not supported; Session: {Session}, Version: {Version}", session.Id, protocol.Version);
+            _logger.LogWarning("AuthorizationController: User client version not supported; Session: {Session}, Version: {Version}", session.Id, protocol.Version);
             session.Send(ProtocolType.USER_CLIENT_WRONGVERSION_CHECK_ACK, new PROTO_USER_CLIENT_WRONGVERSION_CHECK_ACK());
+        }
+
+        /// <summary>
+        /// Request validation of login credentials.
+        /// </summary>
+        /// <param name="sessionId">The session requesting credential validation.</param>
+        /// <param name="protocol">The protocol that was sent.</param>
+        [ProtocolHandler(ProtocolType.USER_US_LOGIN_REQ)]
+        public void USER_US_LOGIN_REQ(Guid sessionId, [FromBody] PROTO_USER_US_LOGIN_REQ protocol)
+        {
+
+        }
+
+        /// <summary>
+        /// Request validation of the client's XTrap key.
+        /// </summary>
+        /// <param name="sessionId">The session requesting XTrap key validation.</param>
+        /// <param name="protocol">The protocol that was sent.</param>
+        [ProtocolHandler(ProtocolType.USER_XTRAP_REQ)]
+        public void USER_XTRAP_REQ(Guid sessionId, [FromBody] PROTO_USER_XTRAP_REQ protocol)
+        {
+
         }
     }
 }
