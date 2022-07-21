@@ -64,18 +64,4 @@ We use conventional commits to help us automate releases for the services. Pleas
 
 <br/>
 
-**Copyright and license information for new files**  
-
-We prefer that all new files created in the Jedi codebase begin with the following copyright notice:
-```
-// <copyright file="$safeitemrootname$.cs" company="Jedi Contributors">
-// Copyright (c) Jedi Contributors. All rights reserved.
-//  
-// This software is licensed under the MIT license. Read the LICENSE file in the 
-// repository for more information.
-// </copyright>
-```
-
-<br/>
-
 If you need help making changes to the codebase, don't hesitate to reach out in the [#help](https://discord.com/channels/966409323817361520/966445867517227042) channel in our Discord server.
