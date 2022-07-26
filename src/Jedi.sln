@@ -29,23 +29,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Contracts", "Common\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Contracts", "Authorization\Authorization.Contracts\Authorization.Contracts.csproj", "{DBA3E239-AECF-49AB-8261-E74F59C8AF93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datastore.Contracts", "Datastore\Datastore.Contracts\Datastore.Contracts.csproj", "{8F42A863-0DA5-4826-A7F0-86B4348D728C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Datastore.Contracts", "Datastore\Datastore.Contracts\Datastore.Contracts.csproj", "{8F42A863-0DA5-4826-A7F0-86B4348D728C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datastore.EntryPoint", "Datastore\Datastore.EntryPoint\Datastore.EntryPoint.csproj", "{C5978AD6-94F5-4B7B-AC51-B1840B43071E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Datastore.EntryPoint", "Datastore\Datastore.EntryPoint\Datastore.EntryPoint.csproj", "{C5978AD6-94F5-4B7B-AC51-B1840B43071E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Contracts", "Game\Game.Contracts\Game.Contracts.csproj", "{BCDA8A29-EB50-4166-A6A0-B8686B2735D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Game.Contracts", "Game\Game.Contracts\Game.Contracts.csproj", "{BCDA8A29-EB50-4166-A6A0-B8686B2735D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.EntryPoint", "Game\Game.EntryPoint\Game.EntryPoint.csproj", "{047B7CC3-35D3-4CA7-8406-DDFCE1636E17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Game.EntryPoint", "Game\Game.EntryPoint\Game.EntryPoint.csproj", "{047B7CC3-35D3-4CA7-8406-DDFCE1636E17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "World.Contracts", "World\World.Contracts\World.Contracts.csproj", "{81C2CB73-2BEF-4147-B8D7-FEEA416EDCBE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "World.Contracts", "World\World.Contracts\World.Contracts.csproj", "{81C2CB73-2BEF-4147-B8D7-FEEA416EDCBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "World.EntryPoint", "World\World.EntryPoint\World.EntryPoint.csproj", "{CB87A764-83BA-462B-BE84-E17C8904E72B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "World.EntryPoint", "World\World.EntryPoint\World.EntryPoint.csproj", "{CB87A764-83BA-462B-BE84-E17C8904E72B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zone.Contracts", "Zone\Zone.Contracts\Zone.Contracts.csproj", "{960EC0F3-1423-437E-998C-9D64FE48FE6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zone.Contracts", "Zone\Zone.Contracts\Zone.Contracts.csproj", "{960EC0F3-1423-437E-998C-9D64FE48FE6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zone.EntryPoint", "Zone\Zone.EntryPoint\Zone.EntryPoint.csproj", "{C848DAD3-15CD-4B6A-84F2-B1F060293BEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zone.EntryPoint", "Zone\Zone.EntryPoint\Zone.EntryPoint.csproj", "{C848DAD3-15CD-4B6A-84F2-B1F060293BEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Mathematics", "Common\Common.Mathematics\Common.Mathematics.csproj", "{400F707C-81A7-40F1-AADE-94530F7A78CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.Mathematics", "Common\Common.Mathematics\Common.Mathematics.csproj", "{400F707C-81A7-40F1-AADE-94530F7A78CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.Services", "Authorization\Authorization.Services\Authorization.Services.csproj", "{4A47B47F-9BD8-451C-96FA-CC4F0AE8D0E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -117,6 +119,10 @@ Global
 		{400F707C-81A7-40F1-AADE-94530F7A78CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{400F707C-81A7-40F1-AADE-94530F7A78CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{400F707C-81A7-40F1-AADE-94530F7A78CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A47B47F-9BD8-451C-96FA-CC4F0AE8D0E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A47B47F-9BD8-451C-96FA-CC4F0AE8D0E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A47B47F-9BD8-451C-96FA-CC4F0AE8D0E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A47B47F-9BD8-451C-96FA-CC4F0AE8D0E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,6 +144,7 @@ Global
 		{960EC0F3-1423-437E-998C-9D64FE48FE6B} = {B3376E5C-0680-41CA-BFDA-75F6B0369F6A}
 		{C848DAD3-15CD-4B6A-84F2-B1F060293BEA} = {B3376E5C-0680-41CA-BFDA-75F6B0369F6A}
 		{400F707C-81A7-40F1-AADE-94530F7A78CE} = {872C4165-A127-45E5-A2D0-6E98BB1D852C}
+		{4A47B47F-9BD8-451C-96FA-CC4F0AE8D0E5} = {B9735E69-EA29-4AA5-9502-DF37FEA6512A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19CA5C8E-91B7-444E-8762-52072047AA84}

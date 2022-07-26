@@ -5,10 +5,9 @@
 // repository for more information.
 // </copyright>
 
-using Jedi.Common.Api.Messaging;
+using Jedi.Common.Api.Constants;
 using Jedi.Common.Api.Sessions;
 using Jedi.Common.Contracts.Protocols;
-using Jedi.Common.Core.Exceptions;
 
 namespace Jedi.Common.Api.Clients
 {
@@ -30,16 +29,47 @@ namespace Jedi.Common.Api.Clients
         /// The session that the client uses to communicate with the service.
         /// </summary>
         public Session Session { get; set; }
-        
+
         /// <summary>
-        /// This method is used by generated API's to send messages to
+        /// This method is used by compiled API's to send messages to
         /// a client.
         /// </summary>
-        protected void BuildAndSend(ProtocolType command, params Protocol[] args)
+        protected void Send(ProtocolCommand command, Protocol protocol)
         {
-            if (!Session.Send(command, args))
+            Session.Send(command, protocol);
+        }
+
+        /// <summary>
+        /// This method is used by compiled API's to send messages to
+        /// a client asynchronously.
+        /// </summary>
+        protected async Task SendAsync(ProtocolCommand command, Protocol protocol)
+        {
+            await Session.SendAsync(command, protocol);
+        }
+
+        /// <summary>
+        /// This method is used by compiled API's to send messages to
+        /// a client asynchronously.
+        /// </summary>
+        protected async Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CorrelatedProtocol protocol) where TResponse : CorrelatedProtocol
+        {
+            return await SendAsync<TResponse>(command, new CancellationTokenSource(TimeSpan.FromMilliseconds(AsyncConstants.AsyncSendTimeout)).Token, protocol);
+        }
+
+        /// <summary>
+        /// This method is used by compiled API's to send messages to
+        /// a client asynchronously with cancellation support.
+        /// </summary>
+        protected async Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CancellationToken cancellationToken, CorrelatedProtocol protocol) where TResponse : CorrelatedProtocol
+        {
+            try
             {
-                throw new SystemError($"Service client failed to send message of type {command} to session {Session.Id}");
+                return await Session.SendAsync<TResponse>(command, cancellationToken, protocol);
+            }
+            catch (OperationCanceledException)
+            {
+                return default;
             }
         }
     }

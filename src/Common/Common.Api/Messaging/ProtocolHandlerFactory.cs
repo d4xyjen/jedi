@@ -5,11 +5,14 @@
 // repository for more information.
 // </copyright>
 
+using Jedi.Common.Api.Sessions;
+using Jedi.Common.Contracts.Protocols;
+using Jedi.Common.Contracts.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Reflection;
-using System.Runtime.Serialization;
+using Jedi.Common.Api.Constants;
 
 namespace Jedi.Common.Api.Messaging
 {
@@ -19,9 +22,14 @@ namespace Jedi.Common.Api.Messaging
     public interface IProtocolHandlerFactory
     {
         /// <summary>
+        /// Find and register all protocols.
+        /// </summary>
+        public void RegisterAllProtocols();
+
+        /// <summary>
         /// Find and register all proto handlers in the current entry assembly.
         /// </summary>
-        public void RegisterAll();
+        public void RegisterAllHandlers();
 
         /// <summary>
         /// Try to identify a message's protocol command.
@@ -40,10 +48,10 @@ namespace Jedi.Common.Api.Messaging
         /// <summary>
         /// Deserialize the message and execute the handler.
         /// </summary>
-        /// <param name="method">The handler method to execute.</param>
+        /// <param name="command">The type of protocol that was received.</param>
         /// <param name="sessionId">The ID of the session that sent the message.</param>
-        /// <param name="data">The message to deserialize.</param>
-        public bool DeserializeAndExecute(ControllerMethod method, Guid sessionId, ArraySegment<byte> data);
+        /// <param name="data">The data to deserialize parameters from.</param>
+        public Task<bool> DeserializeAndHandleAsync(ushort command, Guid sessionId, ArraySegment<byte> data);
     }
 
     /// <summary>
@@ -53,24 +61,29 @@ namespace Jedi.Common.Api.Messaging
     {
         private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ISessionFactory _sessionFactory;
         private readonly ConcurrentDictionary<ushort, List<ControllerMethod>> _handlers;
+        private ConcurrentDictionary<ProtocolCommand, Type> _protocolTypeMappingByCommand;
 
         /// <summary>
         /// Create a new <see cref="ProtocolHandlerFactory"/>.
         /// </summary>
         /// <param name="logger">Logger for the factory to use.</param>
         /// <param name="serviceProvider">Service provider for the factory to use.</param>
-        public ProtocolHandlerFactory(ILogger<IProtocolHandlerFactory> logger, IServiceProvider serviceProvider)
+        /// <param name="sessionFactory">Sesion factory to consume.</param>
+        public ProtocolHandlerFactory(ILogger<IProtocolHandlerFactory> logger, IServiceProvider serviceProvider, ISessionFactory sessionFactory)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
+            _sessionFactory = sessionFactory;
             _handlers = new ConcurrentDictionary<ushort, List<ControllerMethod>>();
+            _protocolTypeMappingByCommand = new ConcurrentDictionary<ProtocolCommand, Type>();
         }
 
         /// <summary>
         /// Find and register all proto handlers.
         /// </summary>
-        public void RegisterAll()
+        public void RegisterAllHandlers()
         {
             // Get all methods within all controller services, which have the 
             // ProtoHandler attribute.
@@ -83,7 +96,7 @@ namespace Jedi.Common.Api.Messaging
                 .Select(controller => new Tuple<Controller, IEnumerable<MethodInfo>>(controller, controller
                     .GetType()
                     .GetMethods()
-                    .Where(method => method.GetCustomAttributes(typeof(ProtocolHandlerAttribute), false).Length > 0)))
+                    .Where(method => method.GetCustomAttributes(typeof(ProtocolAttribute), false).Length > 0)))
                 .ToArray();
 
             for (var i = 0; i < handlerMap.Length; i++)
@@ -91,7 +104,7 @@ namespace Jedi.Common.Api.Messaging
                 var controllerHandlers = handlerMap[i];
                 foreach (var handler in controllerHandlers.Item2)
                 {
-                    var attribute = handler.GetCustomAttribute<ProtocolHandlerAttribute>();
+                    var attribute = handler.GetCustomAttribute<ProtocolAttribute>();
                     if (attribute == null)
                     {
                         continue;
@@ -112,6 +125,20 @@ namespace Jedi.Common.Api.Messaging
                     handlers.Add(new ControllerMethod(attribute.Command, controllerHandlers.Item1, handler, bodyParameters));
                 }
             }
+        }
+
+        /// <summary>
+        /// Find and register all protocols.
+        /// </summary>
+        public void RegisterAllProtocols()
+        {
+            _protocolTypeMappingByCommand = new ConcurrentDictionary<ProtocolCommand, Type>(AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(assembly => assembly
+                    .GetTypes()
+                    .Where(type => type.IsAssignableTo(typeof(Protocol)) && type.GetCustomAttribute<CommandAttribute>() != null)
+                    .Select(type => new KeyValuePair<ProtocolCommand, Type>(type.GetCustomAttribute<CommandAttribute>()!.Command, type))
+                ));
         }
 
         /// <summary>
@@ -157,37 +184,65 @@ namespace Jedi.Common.Api.Messaging
         /// <summary>
         /// Deserialize the message and execute the handler.
         /// </summary>
-        /// <param name="method">The handler method to execute.</param>
+        /// <param name="command">The type of protocol that was received.</param>
         /// <param name="sessionId">The ID of the session that sent the message.</param>
         /// <param name="data">The data to deserialize parameters from.</param>
-        public bool DeserializeAndExecute(ControllerMethod method, Guid sessionId, ArraySegment<byte> data)
+        public async Task<bool> DeserializeAndHandleAsync(ushort command, Guid sessionId, ArraySegment<byte> data)
         {
-            var parameters = new List<object> { sessionId };
-            using var serializer = new BinarySerializer(data);
-
-            for (var i = 0; i < method.BodyParameters.Count; i++)
+            if (!_protocolTypeMappingByCommand.TryGetValue((ProtocolCommand) command, out var protocolType))
             {
-                var bodyParameter = method.BodyParameters[i];
+                _logger.LogError("ProtocolHandlerFactory: Protocol not found for command; Session: {Session}, Command: {Command}", sessionId, (ProtocolCommand) command);
+                return false;
+            }
 
-                try
-                {
-                    var deserializedParameter = serializer.Deserialize(bodyParameter.ParameterType);
-                    if (deserializedParameter == null)
-                    {
-                        _logger.LogError("Failed to deserialize parameter from message body; Name: {ParameterName}, Type: {ParameterType}, Method: {Method}, Controller: {Controller}", bodyParameter.Name, bodyParameter.ParameterType, method.Method.Name, method.Controller.GetType().FullName);
-                        continue;
-                    }
+            using var serializer = new BinarySerializer(data);
+            var protocol = serializer.Deserialize(protocolType);
 
-                    parameters.Add(deserializedParameter);
-                }
-                catch (SerializationException exception)
+            if (_sessionFactory.GetSession(sessionId, out var session) && session != null)
+            {
+                if (protocol is CorrelatedProtocol correlatedProtocol && session.CompleteOperation(correlatedProtocol.OperationId, correlatedProtocol))
                 {
-                    _logger.LogError(exception, "Failed to deserialize parameter {Parameter} from message body; Session: {Session}, Controller: {Controller}, Handler: {Handler}", bodyParameter.Name, sessionId, method.Controller.GetType().FullName, method.Method.Name);
-                    return false;
+                    // the protocol is part of an operation.
+                    //
+                    // no need to run the handlers, we'll continue in the context
+                    // of the asynchronous operation
+                    return true;
                 }
             }
 
-            method.Method.Invoke(method.Controller, parameters.ToArray());
+            if (GetHandlers(command, out var handlers) && handlers != null)
+            {
+                var parameters = new [] { sessionId, protocol };
+                for (var i = 0; i < handlers.Count; i++)
+                {
+                    var handler = handlers[i];
+                    var returnValue = handler.Method.Invoke(handler.Controller, parameters);
+
+                    if (handler.Method.ReturnType != typeof(void))
+                    {
+                        var response = returnValue as Protocol;
+                        if (response == null && returnValue is Task<Protocol> task)
+                        {
+                            if (await Task.WhenAny(task, Task.Delay(AsyncConstants.AsyncHandleTimeout)) == task)
+                            {
+                                // the handler completed before timeout
+                                response = await task;
+                            }
+                            else
+                            {
+                                _logger.LogWarning("ProtocolHandlerFactory: Asynchronous protocol handler timed out; Session: {Session}, Handler: {Handler}, Controller: {Controller}, Request: {Request}, Response: {Response}", sessionId, handler.Method.Name, handler.Controller.GetType().FullName, (ProtocolCommand) command, response);
+                            }
+                        }
+
+                        var responseCommand = response?.GetType().GetCustomAttribute<CommandAttribute>()?.Command;
+                        if (responseCommand == null || !(session?.Send(responseCommand.Value, response) ?? false))
+                        {
+                            _logger.LogError("ProtocolHandlerFactory: Failed to send response; Session: {Session}, Handler: {Handler}, Controller: {Controller}, Request: {Request}, Response: {Response}", sessionId, handler.Method.Name, handler.Controller.GetType().FullName, (ProtocolCommand) command, response);
+                        }
+                    }
+                }
+            }
+
             return true;
         }
     }

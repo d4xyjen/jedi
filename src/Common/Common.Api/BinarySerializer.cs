@@ -5,9 +5,9 @@
 // repository for more information.
 // </copyright>
 
-using Jedi.Common.Contracts.Protocols;
+using Jedi.Common.Api.Constants;
+using Jedi.Common.Contracts.Serialization;
 using Jedi.Common.Core.Exceptions;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
@@ -50,19 +50,29 @@ namespace Jedi.Common.Api
         /// <returns>The serialized data.</returns>
         public byte[] Serialize(object obj)
         {
-            var properties = GetDataMembers(obj);
-
-            for (var i = 0; i < properties.Length; i++)
+            var properties = GetContractDataMembers(obj.GetType());
+            for (var i = 0; i < properties.Count; i++)
             {
                 var property = properties[i];
-                var propertyValue = property?.GetValue(obj);
+                var dataMember = property.GetCustomAttribute<DataMemberAttribute>();
 
-                if (property == null || propertyValue == null)
+                if (dataMember != null)
                 {
-                    continue;
-                }
+                    var propertyValue = property.GetValue(obj);
+                    var value = propertyValue == null && dataMember.EmitDefaultValue ? GetDefaultValue(property.PropertyType, property) : propertyValue;
 
-                Serialize(propertyValue, property);
+                    if (value == null)
+                    {
+                        if (dataMember.IsRequired)
+                        {
+                            throw new SystemError("BinarySerializer.Serialize: Failed to serialize", new ArgumentNullException(dataMember.Name ?? property.Name, "Required data member was not present"));
+                        }
+
+                        continue;
+                    }
+
+                    Serialize(value, property);
+                }
             }
 
             return _stream.ToArray();
@@ -73,63 +83,89 @@ namespace Jedi.Common.Api
         /// </summary>
         /// <param name="type">The type of object to deserialize.</param>
         /// <returns>The deserialized object.</returns>
-        public Protocol? Deserialize(Type type)
+        public object Deserialize(Type type)
         {
-            var obj = Activator.CreateInstance(type);
+            var obj = GetDefaultValue(type);
             if (obj == null)
             {
                 throw new SystemError($"BinarySerializer.Deserialize: Failed to create instance of target type {type.FullName}");
             }
 
-            var properties = GetDataMembers(obj);
-
-            for (var i = 0; i < properties.Length; i++)
+            var properties = GetContractDataMembers(type);
+            for (var i = 0; i < properties.Count; i++)
             {
                 var property = properties[i];
-                if (property == null)
-                {
-                    continue;
-                }
+                var dataMember = property.GetCustomAttribute<DataMemberAttribute>();
 
-                var propertyValue = GetDefaultValue(property);
-                if (propertyValue == null)
+                if (dataMember != null)
                 {
-                    continue;
-                }
+                    var defaultValue = GetDefaultValue(property.PropertyType, property);
+                    var value = Deserialize(defaultValue, property);
 
-                var deserializedProperty = Deserialize(propertyValue, property);
-                if (deserializedProperty == null)
-                {
-                    // Failed to deserialize a property.
-                    // To prevent further errors, just return null.
-                    return null;
-                }
+                    if (value == null && dataMember.IsRequired)
+                    {
+                        throw new SystemError("BinarySerializer.Deserialize: Failed to deserialize", new ArgumentNullException(dataMember.Name ?? property.Name, "Required data member was not initialized."));
+                    }
 
-                property.SetValue(obj, deserializedProperty);
+                    property.SetValue(obj, value);
+                }
             }
 
-            return obj as Protocol;
+            return obj;
         }
 
-        private object? GetDefaultValue(PropertyInfo property)
+        private object? GetDefaultValue(Type? type, PropertyInfo? propertyInfo = null)
         {
-            if (property.PropertyType == typeof(string))
+            if (type == null)
+            {
+                return default;
+            }
+
+            if (type == typeof(string))
             {
                 return string.Empty;
             }
-            else if (property.PropertyType == typeof(byte[]))
-            {
-                return Array.Empty<byte>();
-            }
-            else
-            {
-                return Activator.CreateInstance(property.PropertyType);
-            }
-        }
 
+            if (type.IsArray)
+            {
+                var elementType = type.GetElementType();
+                var arrayLength = propertyInfo?.GetCustomAttribute<LengthAttribute>()?.Length ?? _reader.ReadByte();
+
+                return elementType == null ? null : Array.CreateInstance(elementType, arrayLength);
+            }
+
+            return Activator.CreateInstance(type);
+        }
 
         private void Serialize(object obj, PropertyInfo propertyInfo)
         {
+            if (obj is Array array)
+            {
+                if (!Attribute.IsDefined(propertyInfo, typeof(LengthAttribute)))
+                {
+                    _writer.Write((byte) array.Length);
+                }
+                else if (propertyInfo.GetCustomAttribute<LengthAttribute>()?.Length != array.Length)
+                {
+                    // if the length attribute is specified, the array length must match that length
+                    throw new InvalidDataContractException("Length of the member was not equal its attribute's specification.");
+                }
+
+                for (var i = 0; i < array.Length; i++)
+                {
+                    var value = array.GetValue(i);
+                    if (value == null)
+                    {
+                        throw new NullReferenceException($"Array element at index {i} was null.");
+                    }
+
+                    // serialize each object in the array to the message
+                    Serialize(value, propertyInfo);
+                }
+
+                return;
+            }
+
             switch (obj)
             {
                 case byte:
@@ -168,34 +204,16 @@ namespace Jedi.Common.Api
                 case decimal:
                     _writer.Write((decimal) obj);
                     break;
+                case Guid guid:
+                    WriteString(guid.ToString(), GuidConstants.GuidLength);
+                    break;
                 case string str:
-                    if (propertyInfo.GetCustomAttribute<PrefixLengthAttribute>() != null)
+                    if (!Attribute.IsDefined(propertyInfo, typeof(LengthAttribute)))
                     {
                         _writer.Write((byte) str.Length);
                     }
-
-                    var stringBuffer = Encoding.ASCII.GetBytes(str);
-                    _writer.Write(stringBuffer);
-
-                    for (var i = 0; i < str.Length - (propertyInfo.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? stringBuffer.Length); i++)
-                    {
-                        _writer.Write((byte) 0);
-                    }
-
-                    break;
-                case byte[] byteArray:
-                    if (propertyInfo.GetCustomAttribute<PrefixLengthAttribute>() != null)
-                    {
-                        _writer.Write((byte) byteArray.Length);
-                    }
-
-                    _writer.Write(byteArray);
-
-                    for (var i = 0; i < byteArray.Length - (propertyInfo.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? byteArray.Length); i++)
-                    {
-                        _writer.Write((byte) 0);
-                    }
-
+                    
+                    WriteString(str, propertyInfo.GetCustomAttribute<LengthAttribute>()?.Length);
                     break;
                 default:
                     _writer.Write(Serialize(obj));
@@ -203,8 +221,24 @@ namespace Jedi.Common.Api
             }
         }
 
-        private object? Deserialize(object obj, PropertyInfo propertyInfo)
+        private void WriteString(string value, int? length)
         {
+            var stringBuffer = Encoding.ASCII.GetBytes(value);
+            _writer.Write(stringBuffer);
+
+            for (var i = 0; i < length - stringBuffer.Length; i++)
+            {
+                _writer.Write((byte) 0);
+            }
+        }
+
+        private object? Deserialize(object? obj, PropertyInfo propertyInfo)
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+
             try
             {
                 switch (obj)
@@ -233,46 +267,65 @@ namespace Jedi.Common.Api
                         return _reader.ReadSingle();
                     case decimal:
                         return _reader.ReadDecimal();
+                    case Guid:
+                        return Guid.Parse(ReadString(GuidConstants.GuidLength));
                     case string:
-                        var stringLength = propertyInfo.GetCustomAttribute<PrefixLengthAttribute>() != null
-                            ? _reader.ReadByte()
-                            : propertyInfo.GetCustomAttribute<MaxLengthAttribute>()?.Length ?? 0;
+                        return ReadString(propertyInfo.GetCustomAttribute<LengthAttribute>()?.Length ?? _reader.ReadByte());
 
-                        var stringBuffer = new byte[stringLength];
-                        var charCount = 0;
-
-                        _reader.Read(stringBuffer, 0, stringBuffer.Length);
-
-                        if (stringBuffer[stringLength - 1] != 0)
+                    // array is initialized with the correct length before this method is
+                    // called so there's no need to get it again here
+                    case Array array:
+                        var elementType = propertyInfo.PropertyType.GetElementType();
+                        if (elementType == null)
                         {
-                            charCount = stringLength;
-                        }
-                        else
-                        {
-                            while (stringBuffer[charCount] != 0 && charCount < stringLength)
-                            {
-                                charCount++;
-                            }
+                            return null;
                         }
 
-                        return charCount > 0 ? Encoding.ASCII.GetString(stringBuffer, 0, charCount) : string.Empty;
-                    case byte[]:
-                        // If no max length is specified, just read until we reach the end
-                        // of the stream.
-                        var byteArrayLength = propertyInfo.GetCustomAttribute<PrefixLengthAttribute>() != null
-                            ? _reader.ReadByte()
-                            : propertyInfo.GetCustomAttribute<MaxLengthAttribute>()?.Length ??
-                              (int) (_stream.Length - _stream.Position);
+                        for (var i = 0; i < array.Length; i++)
+                        {
+                            array.SetValue(Deserialize(elementType), i);
+                        }
 
-                        return _reader.ReadBytes(byteArrayLength);
+                        return array;
                     default:
                         return Deserialize(typeof(object));
                 }
+            }
+            catch (FormatException)
+            {
+                if (obj is Guid)
+                {
+                    return Guid.Empty;
+                }
+
+                throw;
             }
             catch (EndOfStreamException)
             {
                 return null;
             }
+        }
+
+        private string ReadString(int length)
+        {
+            var stringBuffer = new byte[length];
+            var charCount = 0;
+
+            _reader.Read(stringBuffer, 0, stringBuffer.Length);
+
+            if (stringBuffer[length - 1] != 0)
+            {
+                charCount = length;
+            }
+            else
+            {
+                while (stringBuffer[charCount] != 0 && charCount < length)
+                {
+                    charCount++;
+                }
+            }
+
+            return charCount > 0 ? Encoding.ASCII.GetString(stringBuffer, 0, charCount) : string.Empty;
         }
 
         /// <summary>
@@ -284,13 +337,41 @@ namespace Jedi.Common.Api
             _writer.Dispose();
         }
 
-        private static PropertyInfo?[] GetDataMembers(object obj)
+        private static List<PropertyInfo> GetContractDataMembers(Type type)
         {
-            return obj
-                .GetType()
-                .GetProperties()
-                .Select(property => property.GetCustomAttribute<IgnoreDataMemberAttribute>() != null ? null : property)
-                .ToArray();
+            var properties = new List<PropertyInfo>();
+            GetContractDataMembers(type, properties);
+            return properties;
+        }
+
+        private static void GetContractDataMembers(Type type, List<PropertyInfo> properties)
+        {
+            // get the properties with the DataMember attribute in order and including
+            // inherited properties that also specify the DataMember attribute
+            //
+            // the order of properties is as follows:
+            //  - data members of base types
+            //  - data members of current type without the Order property of the DataMemberAttribute set, in alphabetical order
+            //  - any data members with the Order property of the DataMemberAttribute set, ordered by the Order property first, then 
+            //  alphabetically if there is more than one member of a certain Order value
+
+            if (type.BaseType?.GetCustomAttribute<DataContractAttribute>() != null)
+            {
+                GetContractDataMembers(type.BaseType, properties);
+            }
+
+            properties.AddRange(type
+                .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+                .Where(property => Attribute.IsDefined(property, typeof(DataMemberAttribute)) && !Attribute.IsDefined(property, typeof(IgnoreDataMemberAttribute)))
+            );
+
+            properties.Sort((property1, property2) =>
+            {
+                var dataMember1 = property1.GetCustomAttribute<DataMemberAttribute>()!;
+                var dataMember2 = property2.GetCustomAttribute<DataMemberAttribute>()!;
+
+                return dataMember2.Order - dataMember1.Order;
+            });
         }
     }
 }

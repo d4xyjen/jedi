@@ -7,6 +7,8 @@
 
 using Jedi.Common.Api;
 using Jedi.Common.Api.Messaging;
+using Jedi.Common.Api.Sessions;
+using Jedi.Common.Mathematics;
 using Jedi.Common.Startup.Constants;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +18,6 @@ using Serilog;
 using Serilog.Events;
 using System.Diagnostics;
 using System.Reflection;
-using Jedi.Common.Api.Sessions;
-using Jedi.Common.Mathematics;
 
 namespace Jedi.Common.Startup
 {
@@ -39,9 +39,12 @@ namespace Jedi.Common.Startup
             }
 
             var host = GetHostBuilder().Build();
+            var protocolHandlerFactory = host.Services.GetRequiredService<IProtocolHandlerFactory>();
 
-            // Register protocol handlers and start the service
-            host.Services.GetRequiredService<IProtocolHandlerFactory>().RegisterAll();
+            // Register protocols and their handlers.
+            protocolHandlerFactory.RegisterAllProtocols();
+            protocolHandlerFactory.RegisterAllHandlers();
+
             host.Run();
         }
 

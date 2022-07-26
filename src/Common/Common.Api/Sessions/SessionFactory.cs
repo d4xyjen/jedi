@@ -21,6 +21,12 @@ namespace Jedi.Common.Api.Sessions
     public interface ISessionFactory
     {
         /// <summary>
+        /// Get all active sessions.
+        /// </summary>
+        /// <returns></returns>
+        public ConcurrentDictionary<Guid, Session> GetSessions();
+
+        /// <summary>
         /// Get a session.
         /// </summary>
         /// <param name="sessionId">The session's ID.</param>
@@ -47,7 +53,7 @@ namespace Jedi.Common.Api.Sessions
         /// </summary>
         /// <param name="serviceEndpoint">The endpoint of the service to connect to.</param>
         /// <param name="session">The session that was created.</param>
-        /// <returns>The session.</returns>
+        /// <returns>Whether or not the session was created.</returns>
         public bool CreateSession(string serviceEndpoint, out Session? session);
 
         /// <summary>
@@ -55,7 +61,7 @@ namespace Jedi.Common.Api.Sessions
         /// </summary>
         /// <param name="serviceEndpoint">The endpoint of the service to connect to.</param>
         /// <param name="session">The session that was created.</param>
-        /// <returns>The session.</returns>
+        /// <returns>Whether or not the session was created.</returns>
         public bool CreateSession(IPEndPoint serviceEndpoint, out Session? session);
     }
 
@@ -68,7 +74,7 @@ namespace Jedi.Common.Api.Sessions
         private readonly IOptionsMonitor<SessionConfiguration> _sessionConfiguration;
         private readonly ISessionEventQueue _eventQueue;
         private readonly ISessionCryptography _sessionCryptography;
-        private readonly ConcurrentDictionary<int, Session> _sessions;
+        private readonly ConcurrentDictionary<int, Session> _sessionsByEndpoint;
         private readonly ConcurrentDictionary<Guid, Session> _sessionsById;
 
         /// <summary>
@@ -77,14 +83,28 @@ namespace Jedi.Common.Api.Sessions
         /// <param name="loggerFactory">Factory to create loggers for sessions.</param>
         /// <param name="sessionConfiguration">The global session configuration.</param>
         /// <param name="eventQueue">Receive pipe for sessions to use.</param>
-        public SessionFactory(ILoggerFactory loggerFactory, IOptionsMonitor<SessionConfiguration> sessionConfiguration, ISessionEventQueue eventQueue, ISessionCryptography sessionCryptography)
+        /// <param name="sessionCryptography">Global session cryptography.</param>
+        public SessionFactory(
+            ILoggerFactory loggerFactory, 
+            IOptionsMonitor<SessionConfiguration> sessionConfiguration, 
+            ISessionEventQueue eventQueue, 
+            ISessionCryptography sessionCryptography)
         {
             _loggerFactory = loggerFactory;
             _sessionConfiguration = sessionConfiguration;
             _eventQueue = eventQueue;
             _sessionCryptography = sessionCryptography;
-            _sessions = new ConcurrentDictionary<int, Session>();
+            _sessionsByEndpoint = new ConcurrentDictionary<int, Session>();
             _sessionsById = new ConcurrentDictionary<Guid, Session>();
+        }
+
+        /// <summary>
+        /// Get all active sessions.
+        /// </summary>
+        /// <returns>A dictionary of all active sessions, mapped by ID.</returns>
+        public ConcurrentDictionary<Guid, Session> GetSessions()
+        {
+            return _sessionsById;
         }
 
         /// <summary>
@@ -155,7 +175,7 @@ namespace Jedi.Common.Api.Sessions
         public bool CreateSession(IPEndPoint serviceEndpoint, out Session? session)
         {
             var serviceEndpointHash = serviceEndpoint.GetHashCode();
-            if (_sessions.TryGetValue(serviceEndpointHash, out session) && session.Connected)
+            if (_sessionsByEndpoint.TryGetValue(serviceEndpointHash, out session) && session.Connected)
             {
                 return true;
             }
@@ -169,7 +189,7 @@ namespace Jedi.Common.Api.Sessions
 
                 if (client.Connected)
                 {
-                    session = _sessions[serviceEndpointHash] = CreateSession(client);
+                    session = _sessionsByEndpoint[serviceEndpointHash] = CreateSession(client);
                     return true;
                 }
             }

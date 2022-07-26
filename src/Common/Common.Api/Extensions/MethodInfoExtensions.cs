@@ -247,6 +247,12 @@ namespace Jedi.Common.Api.Extensions
 
                 if (method.IsStatic)
                     sigBuilder.Append("static ");
+                
+                if (method.ReturnType == typeof(Task) || method.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    sigBuilder.Append("async ");
+                }
+
                 sigBuilder.Append(TypeName(method.ReturnType));
                 sigBuilder.Append(' ');
             }

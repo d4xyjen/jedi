@@ -4,33 +4,23 @@
 // This software is licensed under the MIT license. Read the LICENSE file in the
 // repository for more information.
 // </copyright>
+
+using Jedi.Common.Contracts.Serialization;
+using System.Runtime.Serialization;
+
 namespace Jedi.Common.Contracts.Protocols.User
 {
     /// <summary>
     /// Verifies the client's XTrap key.
     /// </summary>
+    [DataContract]
+    [Command(ProtocolCommand.USER_XTRAP_REQ)]
     public class PROTO_USER_XTRAP_REQ : Protocol
     {
         /// <summary>
         /// The client's XTrap key.
         /// </summary>
-        [PrefixLength]
+        [DataMember]
         public byte[] XTrapKey { get; set; }
-
-        /// <summary>
-        /// Parameterless constructor for deserialization.
-        /// </summary>
-        public PROTO_USER_XTRAP_REQ()
-        {
-        }
-
-        /// <summary>
-        /// Create a new <see cref="PROTO_USER_XTRAP_REQ"/>.
-        /// </summary>
-        /// <param name="xTrapKey">The client's XTrap key.</param>
-        public PROTO_USER_XTRAP_REQ(byte[] xTrapKey)
-        {
-            XTrapKey = xTrapKey;
-        }
     }
 }

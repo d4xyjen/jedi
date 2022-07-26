@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Reflection;
+using Jedi.Common.Contracts.Protocols;
 
 namespace Jedi.Common.Api.Clients
 {
@@ -79,8 +80,17 @@ namespace Jedi.Common.Api.Clients
 
                 try
                 {
-                    var scriptOptions = ScriptOptions.Default.WithReferences(Assembly.GetEntryAssembly());
-                    var serviceClientSource = CSharpScript.Create(serviceClientBuilder.ToString(), scriptOptions);
+                    var serviceClientSource = CSharpScript.Create(serviceClientBuilder.ToString(), ScriptOptions.Default.WithReferences(
+                        Assembly.GetEntryAssembly(),
+                        typeof(Task).Assembly,
+                        typeof(Task<>).Assembly,
+                        typeof(Protocol).Assembly,
+                        typeof(CorrelatedProtocol).Assembly
+                    ).WithImports(
+                        typeof(Task).Namespace,
+                        typeof(Task<>).Namespace,
+                        typeof(Protocol).Namespace,
+                        typeof(CorrelatedProtocol).Namespace));
                     
                     serviceClientSource.Compile();
 

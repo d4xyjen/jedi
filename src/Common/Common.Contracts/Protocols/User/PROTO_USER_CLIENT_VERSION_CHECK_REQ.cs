@@ -5,35 +5,23 @@
 // repository for more information.
 // </copyright>
 
-using System.ComponentModel.DataAnnotations;
+using Jedi.Common.Contracts.Serialization;
+using System.Runtime.Serialization;
 
 namespace Jedi.Common.Contracts.Protocols.User
 {
     /// <summary>
     /// Requests a version check.
     /// </summary>
+    [DataContract]
+    [Command(ProtocolCommand.USER_CLIENT_VERSION_CHECK_REQ)]
     public class PROTO_USER_CLIENT_VERSION_CHECK_REQ : Protocol
     {
         /// <summary>
         /// The client's version key.
         /// </summary>
-        [MaxLength(64)]
+        [DataMember]
+        [Length(64)]
         public string Version { get; set; }
-
-        /// <summary>
-        /// Parameterless constructor for deserialization.
-        /// </summary>
-        public PROTO_USER_CLIENT_VERSION_CHECK_REQ()
-        {
-        }
-
-        /// <summary>
-        /// Create a new <see cref="PROTO_USER_CLIENT_VERSION_CHECK_REQ"/>.
-        /// </summary>
-        /// <param name="version">The client version key.</param>
-        public PROTO_USER_CLIENT_VERSION_CHECK_REQ(string version)
-        {
-            Version = version;
-        }
     }
 }

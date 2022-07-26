@@ -5,8 +5,6 @@
 // repository for more information.
 // </copyright>
 
-using Jedi.Common.Api.Messaging;
-
 namespace Jedi.Game.Contracts
 {
     /// <summary>
@@ -14,10 +12,5 @@ namespace Jedi.Game.Contracts
     /// </summary>
     public interface IGameController
     {
-        /// <summary>
-        /// Create a new avatar.
-        /// </summary>
-        [ProtocolHandler(ProtocolType.AVATAR_CREATE_REQ)]
-        public void AVATAR_CREATE_REQ();
     }
 }

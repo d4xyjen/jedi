@@ -168,7 +168,7 @@ namespace Jedi.Common.Api.Sessions
         }
 
         /// <summary>
-        /// Clear the pipe.
+        /// Clear the event queue.
         /// </summary>
         public void Clear()
         {

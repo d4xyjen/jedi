@@ -6,8 +6,11 @@
 // </copyright>
 
 using Jedi.Authorization.Contracts;
+using Jedi.Common.Api.Clients;
 using Jedi.Common.Contracts;
+using Jedi.Common.S2SCommunication;
 using Jedi.Common.Startup;
+using Jedi.Datastore.Contracts;
 
 namespace Jedi.Authorization.EntryPoint
 {
@@ -37,7 +40,12 @@ namespace Jedi.Authorization.EntryPoint
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<AuthorizationConfiguration>(_configuration);
+            services.Configure<DatastoreConfiguration>(_configuration.GetSection("Datastore"));
             services.Configure<SessionConfiguration>(_configuration.GetSection("Sessions"));
+
+            services.AddSingleton<IServiceClientFactory<IDatastoreController>, ServiceClientFactory<IDatastoreController>>();
+
+            services.AddSingleton<IDatastoreClient, DatastoreClient>();
 
             services.AddHostedService<ServiceWorker>();
         }

@@ -17,6 +17,6 @@ namespace Jedi.Authorization.Contracts
         /// <summary>
         /// Supported game client versions.
         /// </summary>
-        public string[]? SupportedGameClientVersions { get; set; }
+        public string[]? SupportedGameVersions { get; set; }
     }
 }

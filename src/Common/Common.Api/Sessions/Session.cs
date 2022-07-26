@@ -11,13 +11,13 @@ using Jedi.Common.Contracts.Protocols;
 using Jedi.Common.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
-using ProtocolType = Jedi.Common.Api.Messaging.ProtocolType;
 
 namespace Jedi.Common.Api.Sessions
 {
     /// <summary>
-    /// Core session class
+    /// Base session class.
     /// </summary>
     public class Session : Entity
     {
@@ -30,6 +30,7 @@ namespace Jedi.Common.Api.Sessions
         private readonly Thread _sendThread;
         private readonly Thread _receiveThread;
         private readonly ManualResetEvent _sendPending;
+        private ushort? _seed;
 
         /// <summary>
         /// Create a new <see cref="Session"/>.
@@ -55,6 +56,7 @@ namespace Jedi.Common.Api.Sessions
             _sendThread = new Thread(Send) { IsBackground = true };
             _receiveThread = new Thread(Receive) { IsBackground = true };
             _sendPending = new ManualResetEvent(false);
+            PendingOperations = new ConcurrentDictionary<Guid, CorrelatedProtocol?>();
         }
 
         /// <summary>
@@ -63,9 +65,15 @@ namespace Jedi.Common.Api.Sessions
         public bool Connected => _tcpClient.Client.Connected;
 
         /// <summary>
-        /// The session's seed, used for cryptography.
+        /// Whether or not heartbeat is enabled for the session.
         /// </summary>
-        public ushort? Seed { get; set; }
+        public bool HeartbeatEnabled { get; set; } = false;
+
+        /// <summary>
+        /// The session's pending asynchronous operations.
+        /// These are tasks that run until the session receives a correlated protocol.
+        /// </summary>
+        public ConcurrentDictionary<Guid, CorrelatedProtocol?> PendingOperations { get; }
 
         /// <summary>
         /// Start the session.
@@ -80,35 +88,53 @@ namespace Jedi.Common.Api.Sessions
         }
 
         /// <summary>
-        /// Generate a new seed for the session.
+        /// Set a new seed for the session.
         /// </summary>
-        public void GetNewSeed()
+        public ushort? Seed()
         {
-            Seed = _sessionCryptography.GenerateSeed();
+            return Seed(_sessionCryptography.GenerateSeed());
+        }
+
+        /// <summary>
+        /// Set a new seed for the session.
+        /// </summary>
+        public ushort? Seed(ushort seed)
+        {
+            return _seed = seed;
+        }
+
+        /// <summary>
+        /// Send an empty message to the session.
+        /// </summary>
+        /// <param name="command">The type of protocol to send.</param>
+        /// <returns>True if the message was sent, false if it wasn't.</returns>
+
+        public bool Send(ProtocolCommand command)
+        {
+            return Send(command, null);
         }
 
         /// <summary>
         /// Send a protocol to the session.
         /// </summary>
-        /// <param name="command">The command to send.</param>
-        /// <param name="protocols">The protocols to send.</param>
+        /// <param name="command">The type of protocol to send.</param>
+        /// <param name="protocol">The protocol to send.</param>
         /// <returns>True if the message was sent, false if it wasn't.</returns>
-        public bool Send(ProtocolType command, params Protocol[] protocols)
+        public bool Send(ProtocolCommand command, Protocol? protocol)
         {
             try
             {
+                _logger.LogInformation("Session: Serializing message; Session: {Session}, Command: {Command}, Protocol: {Protocol}", Id, command, protocol?.GetType().FullName);
+
                 using var stream = new MemoryStream();
                 using var writer = new BinaryWriter(stream);
                 using var serializer = new BinarySerializer();
 
                 writer.Write((ushort) command);
 
-                for (var i = 0; i < protocols.Length; i++)
+                if (protocol != null)
                 {
-                    var arg = protocols[i];
-                    var serializedArg = serializer.Serialize(arg);
-
-                    writer.Write(serializedArg);
+                    writer.Write(serializer.Serialize(protocol));
                 }
 
                 var body = stream.ToArray();
@@ -132,9 +158,66 @@ namespace Jedi.Common.Api.Sessions
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Session: Failed to send protocol; Session: {Session}, Protocol: {Protocol}, Args: {Args}", Id, command, protocols.Length);
+                _logger.LogError(exception, "Session: Failed to send message; Session: {Session}, Command: {Command}, Protocol: {Protocol}", Id, command, protocol?.GetType().FullName);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Send a message to the session asynchronously.
+        /// </summary>
+        /// <param name="command">The type of protocol to send.</param>
+        /// <param name="protocol">The protocol to send.</param>
+        public Task SendAsync(ProtocolCommand command, Protocol protocol)
+        {
+            return Task.Run(() =>
+            {
+                Send(command, protocol);
+            });
+        }
+
+        /// <summary>
+        /// Send a protocol to the session asynchronously and get a protocol back.
+        /// </summary>
+        /// <param name="command">The type of protocol to send.</param>
+        /// <param name="protocol">The protocol to send.</param>
+        public Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CorrelatedProtocol protocol) where TResponse : CorrelatedProtocol
+        {
+            return SendAsync<TResponse>(command, CancellationToken.None, protocol);
+        }
+
+        /// <summary>
+        /// Send a protocol to the session asynchronously and get a protocol back with support for cancellation.
+        /// </summary>
+        /// <param name="command">The type of protocol to send.</param>
+        /// <param name="cancellationToken">Cancellation token used to cancel the operation.</param>
+        /// <param name="protocol">The protocol to send.</param>
+        public Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CancellationToken cancellationToken, CorrelatedProtocol protocol) where TResponse : CorrelatedProtocol
+        {
+            return Task.Run(async () =>
+            {
+                if (!PendingOperations.TryAdd(protocol.OperationId, null))
+                {
+                    return null;
+                }
+
+                Send(command, protocol);
+
+                CorrelatedProtocol? response = null;
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    if (PendingOperations.TryGetValue(protocol.OperationId, out response) && response != null)
+                    {
+                        break;
+                    }
+
+                    await Task.Delay(10, cancellationToken);
+                }
+
+                PendingOperations.TryRemove(protocol.OperationId, out _);
+                return (TResponse?) response;
+
+            }, cancellationToken);
         }
 
         /// <summary>
@@ -266,12 +349,12 @@ namespace Jedi.Common.Api.Sessions
 
                     var payload = new ArraySegment<byte>(payloadBuffer, 0, payloadSize);
 
-                    if (Seed.HasValue)
+                    if (_seed.HasValue)
                     {
-                        Seed = _sessionCryptography.Xor(payload, Seed.Value);
+                        _seed = _sessionCryptography.Xor(payload, _seed.Value);
                     }
 
-                    _eventQueue.Enqueue(Id, SessionEventType.Message, payload);
+                    _eventQueue.Enqueue(Id, SessionEventType.Protocol, payload);
 
                     if (_eventQueue.GetCounter(Id) >= _sessionConfiguration.CurrentValue.EventBacklogPerSession)
                     {
@@ -345,19 +428,32 @@ namespace Jedi.Common.Api.Sessions
         }
 
         /// <summary>
+        /// Complete an asynchronous operation.
+        /// </summary>
+        /// <param name="operationId">The operation's identifier.</param>
+        /// <param name="response">The response for the operation.</param>
+        public bool CompleteOperation(Guid operationId, CorrelatedProtocol response)
+        {
+            return PendingOperations.TryUpdate(operationId, response, null);
+        }
+
+        /// <summary>
         /// Dispose of the session.
-        /// This is an internal method and should not be called. Use Destroy() instead.
+        /// This is an internal method and should not be called. Entities should use Destroy() instead.
         /// </summary>
         protected override void Dispose(bool disposing)
         {
             try
             {
-                _sendThread.Interrupt();
-                _receiveThread.Interrupt();
+                if (disposing)
+                {
+                    _sendThread.Interrupt();
+                    _receiveThread.Interrupt();
 
-                _messageQueue.Clear();
+                    _messageQueue.Clear();
 
-                _tcpClient.Close();
+                    _tcpClient.Close();
+                }
             }
             catch (ObjectDisposedException)
             {

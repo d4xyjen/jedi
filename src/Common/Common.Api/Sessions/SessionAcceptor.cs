@@ -5,12 +5,12 @@
 // repository for more information.
 // </copyright>
 
-using System.Net;
-using System.Net.Sockets;
 using Jedi.Common.Contracts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net;
+using System.Net.Sockets;
 
 namespace Jedi.Common.Api.Sessions
 {
@@ -75,6 +75,23 @@ namespace Jedi.Common.Api.Sessions
         }
 
         /// <summary>
+        /// Stop the session acceptor.
+        /// </summary>
+        /// <param name="cancellationToken">The host's cancellation token.</param>
+        /// <returns>The stop task.</returns>
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("SessionAcceptor: Stopping session acceptor");
+
+            await base.StopAsync(cancellationToken); // wait for the execution thread to finish first
+
+            // stop listening for and accepting new sessions
+            _listener?.Stop();
+
+            _logger.LogInformation("SessionAcceptor: Stopped session acceptor");
+        }
+
+        /// <summary>
         /// Called when the session acceptor starts.
         /// This method executes the session acceptor's work.
         /// This mainly includes handling session events in the receive pipe.
@@ -106,23 +123,6 @@ namespace Jedi.Common.Api.Sessions
             {
                 _logger.LogError(exception, "SessionAcceptor: An exception occurred while executing the acceptor");
             }
-        }
-
-        /// <summary>
-        /// Stop the session acceptor.
-        /// </summary>
-        /// <param name="cancellationToken">The host's cancellation token.</param>
-        /// <returns>The stop task.</returns>
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("SessionAcceptor: Stopping session acceptor");
-
-            await base.StopAsync(cancellationToken); // wait for the execution thread to finish first
-
-            // stop listening for and accepting new sessions
-            _listener?.Stop();
-
-            _logger.LogInformation("SessionAcceptor: Stopped session acceptor");
         }
     }
 }

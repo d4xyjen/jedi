@@ -5,10 +5,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-World.EntryPoint-1C5975BC-B84D-4ACD-B8DE-BCDF9A00E293</UserSecretsId>
-    <BaseOutputPath>$(SolutionDir)..\target\service\$(AssemblyName)</BaseOutputPath>
     <AssemblyName>Jedi.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Jedi.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <StartupObject>Jedi.World.EntryPoint.Program</StartupObject>
+    <BaseOutputPath>$(SolutionDir)..\target\service\$(AssemblyName)</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

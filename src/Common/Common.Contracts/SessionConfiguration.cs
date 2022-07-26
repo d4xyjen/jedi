@@ -82,5 +82,17 @@ namespace Jedi.Common.Contracts
         /// Defaults to 1 hundred events per tick.
         /// </summary>
         public int ThrottlingLimit { get; set; } = 100;
+
+        /// <summary>
+        /// The rate at which the heartbeat monitor looks for sessions in minutes.
+        /// Defaults to 1.
+        /// </summary>
+        public int HeartbeatInterval { get; set; } = 1;
+
+        /// <summary>
+        /// The time before a heartbeat request times out, in milliseconds.
+        /// If no heartbeat is found after this time, the session will be destroyed.
+        /// </summary>
+        public int HeartbeatTimeout { get; set; } = 1000;
     }
 }

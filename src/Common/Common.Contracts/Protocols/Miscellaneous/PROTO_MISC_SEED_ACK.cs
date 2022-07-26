@@ -5,32 +5,22 @@
 // repository for more information.
 // </copyright>
 
+using Jedi.Common.Contracts.Serialization;
+using System.Runtime.Serialization;
+
 namespace Jedi.Common.Contracts.Protocols.Miscellaneous
 {
     /// <summary>
     /// Contains seed information for session cryptography.
     /// </summary>
+    [DataContract]
+    [Command(ProtocolCommand.MISC_SEED_ACK)]
     public class PROTO_MISC_SEED_ACK : Protocol
     {
         /// <summary>
         /// The seed.
         /// </summary>
+        [DataMember]
         public ushort Seed { get; set; }
-
-        /// <summary>
-        /// Parameterless constructor for deserialization.
-        /// </summary>
-        public PROTO_MISC_SEED_ACK()
-        {
-        }
-
-        /// <summary>
-        /// Create a new <see cref="PROTO_MISC_SEED_ACK"/>.
-        /// </summary>
-        /// <param name="seed">The session seed.</param>
-        public PROTO_MISC_SEED_ACK(ushort seed)
-        {
-            Seed = seed;
-        }
     }
 }

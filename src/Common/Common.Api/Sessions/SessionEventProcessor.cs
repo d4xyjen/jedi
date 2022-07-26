@@ -7,6 +7,7 @@
 
 using Jedi.Common.Api.Messaging;
 using Jedi.Common.Contracts;
+using Jedi.Common.Contracts.Protocols;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -76,78 +77,43 @@ namespace Jedi.Common.Api.Sessions
                     var throttlingLimit = _sessionConfiguration.CurrentValue.ThrottlingEnabled ? _sessionConfiguration.CurrentValue.ThrottlingLimit : int.MaxValue;
                     for (var i = 0; i < throttlingLimit; i++)
                     {
-                        if (!_eventQueue.TryPeek(out var sessionId, out var eventType, out var message))
+                        if (!_eventQueue.TryPeek(out var sessionId, out var eventType, out var protocol))
                         {
                             // no more events to process
                             break;
-                        }
-
-                        if (!_sessionFactory.GetSession(sessionId, out var session) || session == null)
-                        {
-                            continue;
                         }
 
                         // process the event
                         switch (eventType)
                         {
                             case SessionEventType.Start:
-                                _logger.LogInformation("SessionEventProcessor: Processing start event; Session: {Session}", sessionId);
-
-                                // "Request" a seed for the new session
-                                if (!_protocolHandlerFactory.GetHandlers((ushort) ProtocolType.MISC_SEED_REQ, out var seedReqHandlers) || seedReqHandlers == null)
-                                {
-                                    _logger.LogError("SessionEventProcessor: Failed to get handlers for message; Session: {Session}, Protocol: {Protocol}", sessionId, ProtocolType.MISC_SEED_REQ);
-                                    break;
-                                }
-
-                                // Execute all handlers for the command (we allow multiple)
-                                for (var j = 0; j < seedReqHandlers.Count; j++)
-                                {
-                                    var method = seedReqHandlers[j];
-                                    if (!_protocolHandlerFactory.DeserializeAndExecute(method, sessionId, message))
-                                    {
-                                        _logger.LogError("SessionEventProcessor: Failed to deserialize and execute handler; Session: {Session}, Controller: {Controller}, Method: {Handler}", sessionId, method.Controller.GetType().FullName, method.Method.Name);
-                                    }
-                                }
+                                _logger.LogInformation("SessionEventProcessor: Session starting; Session: {Session}", sessionId);
 
                                 _logger.LogInformation("SessionEventProcessor: Session started; Session: {Session}", sessionId);
                                 break;
-                            case SessionEventType.Message:
-                                if (message.Array == null)
+                            case SessionEventType.Protocol:
+                                if (protocol.Array == null)
                                 {
-                                    _logger.LogError("SessionEventProcessor: Received empty message; Session: {Session}", sessionId);
+                                    _logger.LogError("SessionEventProcessor: Received empty protocol; Session: {Session}", sessionId);
                                     break;
                                 }
 
-                                if (!_protocolHandlerFactory.GetCommand(message, out var protocolCommand))
+                                if (!_protocolHandlerFactory.GetCommand(protocol, out var command))
                                 {
-                                    _logger.LogError("SessionEventProcessor: Failed to identify message; Session: {Session}", sessionId);
+                                    _logger.LogError("SessionEventProcessor: Failed to identify protocol; Session: {Session}", sessionId);
                                     break;
                                 }
 
-                                _logger.LogInformation("SessionEventProcessor: Processing message event; Session: {Session}, Protocol: {Protocol}", sessionId, (ProtocolType) protocolCommand);
+                                _logger.LogInformation("SessionEventProcessor: Received protocol; Session: {Session}, Command: {Command}", sessionId, (ProtocolCommand) command);
 
-                                if (!_protocolHandlerFactory.GetHandlers(protocolCommand, out var handlers) || handlers == null)
+                                if (!await _protocolHandlerFactory.DeserializeAndHandleAsync(command, sessionId, new ArraySegment<byte>(protocol.Array, protocol.Offset + 2, protocol.Count - 2)))
                                 {
-                                    _logger.LogError("SessionEventProcessor: Failed to get handlers for message; Session: {Session}, Protocol: {Protocol}", sessionId, (ProtocolType) protocolCommand);
-                                    break;
-                                }
-
-                                // Execute all handlers for the command (we allow multiple)
-                                for (var j = 0; j < handlers.Count; j++)
-                                {
-                                    var method = handlers[j];
-                                    
-                                    // Skip the protocol command in the message headers
-                                    if (!_protocolHandlerFactory.DeserializeAndExecute(method, sessionId, new ArraySegment<byte>(message.Array, message.Offset + 2, message.Count - 2)))
-                                    {
-                                        _logger.LogError("SessionEventProcessor: Failed to deserialize and execute handler; Session: {Session}, Controller: {Controller}, Method: {Handler}", sessionId, method.Controller.GetType().FullName, method.Method.Name);
-                                    }
+                                    _logger.LogError("SessionEventProcessor: Failed to deserialize and handle protocol; Session: {Session}, Command: {Command}", sessionId, (ProtocolCommand) command);
                                 }
 
                                 break;
                             case SessionEventType.Destroy:
-                                _logger.LogInformation("SessionEventProcessor: Processing destroy event; Session: {Session}", sessionId);
+                                _logger.LogInformation("SessionEventProcessor: Destroying session; Session: {Session}", sessionId);
 
                                 if (_sessionFactory.DestroySession(sessionId, out var unused))
                                 {

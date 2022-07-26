@@ -13,7 +13,7 @@ namespace Jedi.Common.Api.Sessions
     public enum SessionEventType
     {
         Start,
-        Message,
+        Protocol,
         Destroy
     }
 }

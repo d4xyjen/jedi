@@ -5,8 +5,8 @@
 // repository for more information.
 // </copyright>
 
+using Jedi.Common.Contracts.Protocols;
 using System.Reflection;
-using Jedi.Common.Api.Messaging;
 
 namespace Jedi.Common.Api
 {
@@ -22,7 +22,7 @@ namespace Jedi.Common.Api
         /// <param name="controller">The controller that the method is in.</param>
         /// <param name="method">The method that gets called to handle the protocol.</param>
         /// <param name="bodyParameters">The parameters that should be deserialized from the message body.</param>
-        public ControllerMethod(ProtocolType command, Controller controller, MethodInfo method, List<ParameterInfo> bodyParameters)
+        public ControllerMethod(ProtocolCommand command, Controller controller, MethodInfo method, List<ParameterInfo> bodyParameters)
         {
             Command = command;
             Controller = controller;
@@ -33,7 +33,7 @@ namespace Jedi.Common.Api
         /// <summary>
         /// The command that the method handles.
         /// </summary>
-        public ProtocolType Command { get; }
+        public ProtocolCommand Command { get; }
 
         /// <summary>
         /// The type of controller that the handler is in.

@@ -66,7 +66,7 @@ namespace Jedi.Common.Api.Sessions
             {
                 for (var i = data.Offset; i < data.Count; i++)
                 {
-                    data.Array[data.Offset + i] ^= XorValues[seed++];
+                    data.Array[i] ^= XorValues[seed++];
                     if (seed >= XorValues.Length)
                     {
                         seed = 0;

@@ -5,13 +5,10 @@
 // repository for more information.
 // </copyright>
 
-using Jedi.Authorization.Contracts;
 using Jedi.Common.Api;
-using Jedi.Common.Api.Messaging;
 using Jedi.Common.Api.Sessions;
+using Jedi.Common.Contracts.Protocols;
 using Jedi.Common.Contracts.Protocols.Miscellaneous;
-using Jedi.Common.Contracts.Protocols.User;
-using Microsoft.Extensions.Options;
 
 namespace Jedi.Authorization.EntryPoint.Controllers
 {
@@ -20,111 +17,52 @@ namespace Jedi.Authorization.EntryPoint.Controllers
     /// </summary>
     public class AuthorizationController : Controller
     {
-        public static readonly byte[] XTrapKey = { 0x33, 0x33, 0x42, 0x35, 0x34, 0x33, 0x42, 0x30, 0x43, 0x41, 0x36, 0x45, 0x37, 0x43, 0x34, 0x31, 0x45, 0x35, 0x44, 0x31, 0x44, 0x30, 0x36, 0x35, 0x31, 0x33, 0x30, 0x37, 0x0 };
-
         private readonly ILogger<AuthorizationController> _logger;
         private readonly ISessionFactory _sessionFactory;
-        private readonly IOptionsMonitor<AuthorizationConfiguration> _authorizationConfiguration;
 
         /// <summary>
         /// Create a new <see cref="AuthorizationController"/>.
         /// </summary>
         /// <param name="logger">Logger for the controller to use.</param>
         /// <param name="sessionFactory">Factory used to get sessions.</param>
-        /// <param name="authorizationConfiguration">Configuration for the authorization service.</param>
-        public AuthorizationController(ILogger<AuthorizationController> logger, ISessionFactory sessionFactory, IOptionsMonitor<AuthorizationConfiguration> authorizationConfiguration)
+        public AuthorizationController(
+            ILogger<AuthorizationController> logger, 
+            ISessionFactory sessionFactory)
         {
             _logger = logger;
             _sessionFactory = sessionFactory;
-            _authorizationConfiguration = authorizationConfiguration;
         }
 
         /// <summary>
         /// Request a new seed.
         /// </summary>
-        /// <param name="sessionId">The session requesting a seed.</param>
+        /// <param name="sessionId">The session requesting a new seed.</param>
         /// <param name="protocol">The protocol that was sent.</param>
-        [ProtocolHandler(ProtocolType.MISC_SEED_REQ)]
-        public void MISC_SEED_REQ(Guid sessionId, [FromBody] PROTO_MISC_SEED_REQ protocol)
+        [Protocol(ProtocolCommand.MISC_SEED_REQ)]
+        public PROTO_MISC_SEED_ACK? GetSeed(Guid sessionId, [FromBody] PROTO_MISC_SEED_REQ protocol)
         {
             _logger.LogInformation("AuthorizationController: Session requested a new seed; Session: {Session}", sessionId);
 
             if (!_sessionFactory.GetSession(sessionId, out var session) || session == null)
             {
                 _logger.LogError("AuthorizationController: Failed to get session; Session: {Session}", sessionId);
-                return;
+                return null;
             }
 
-            session.GetNewSeed();
-
-            if (!session.Seed.HasValue)
+            var seed = session.Seed();
+            if (!seed.HasValue)
             {
-                _logger.LogError("AuthorizationController: Failed to get new seed for session; Session: {Session}", sessionId);
-                return;
+                _logger.LogError("AuthorizationController: Failed to set seed, destroying session; Session: {Session}, Seed: {Seed}", sessionId, seed);
+                session.Destroy();
+                return null;
             }
 
-            session.Send(ProtocolType.MISC_SEED_ACK, new PROTO_MISC_SEED_ACK(session.Seed.Value));
-            _logger.LogInformation("AuthorizationController: Assigned new seed to session; Session: {Session}, Seed: {Seed}", session.Id, session.Seed);
-        }
+            _logger.LogInformation("AuthorizationController: Set session seed; Session: {Session}, Seed: {Seed}", session.Id, seed);
 
-        /// <summary>
-        /// Request that the service check the client version.
-        /// </summary>
-        /// <param name="sessionId">The session requesting the version check.</param>
-        /// <param name="protocol">The protocol that was sent.</param>
-        [ProtocolHandler(ProtocolType.USER_CLIENT_VERSION_CHECK_REQ)]
-        public void USER_CLIENT_VERSION_CHECK_REQ(Guid sessionId, [FromBody] PROTO_USER_CLIENT_VERSION_CHECK_REQ protocol)
-        {
-            _logger.LogInformation("AuthorizationController: User requesting client version check; Session: {Session}, Version: {Version}", sessionId, protocol.Version);
-
-            if (!_sessionFactory.GetSession(sessionId, out var session) || session == null)
+            return new PROTO_MISC_SEED_ACK
             {
-                _logger.LogError("AuthorizationController: Failed to get session; Session: {Session}", sessionId);
-                return;
-            }
-
-            var supportedVersions = _authorizationConfiguration.CurrentValue.SupportedGameClientVersions;
-            if (supportedVersions == null)
-            {
-                _logger.LogError("AuthorizationController: No supported versions were configured; Session: {Session}", session.Id);
-                return;
-            }
-
-            for (var i = 0; i < supportedVersions.Length; i++)
-            {
-                var supportedVersion = supportedVersions[i];
-                if (protocol.Version.Equals(supportedVersion))
-                {
-                    _logger.LogInformation("AuthorizationController: User client version supported; Session: {Session}, Version: {Version}", session.Id, protocol.Version);
-                    session.Send(ProtocolType.USER_CLIENT_RIGHTVERSION_CHECK_ACK, new PROTO_USER_CLIENT_RIGHTVERSION_CHECK_ACK(XTrapKey));
-                    return;
-                }
-            }
-
-            _logger.LogWarning("AuthorizationController: User client version not supported; Session: {Session}, Version: {Version}", session.Id, protocol.Version);
-            session.Send(ProtocolType.USER_CLIENT_WRONGVERSION_CHECK_ACK, new PROTO_USER_CLIENT_WRONGVERSION_CHECK_ACK());
-        }
-
-        /// <summary>
-        /// Request validation of login credentials.
-        /// </summary>
-        /// <param name="sessionId">The session requesting credential validation.</param>
-        /// <param name="protocol">The protocol that was sent.</param>
-        [ProtocolHandler(ProtocolType.USER_US_LOGIN_REQ)]
-        public void USER_US_LOGIN_REQ(Guid sessionId, [FromBody] PROTO_USER_US_LOGIN_REQ protocol)
-        {
-
-        }
-
-        /// <summary>
-        /// Request validation of the client's XTrap key.
-        /// </summary>
-        /// <param name="sessionId">The session requesting XTrap key validation.</param>
-        /// <param name="protocol">The protocol that was sent.</param>
-        [ProtocolHandler(ProtocolType.USER_XTRAP_REQ)]
-        public void USER_XTRAP_REQ(Guid sessionId, [FromBody] PROTO_USER_XTRAP_REQ protocol)
-        {
-
+                Seed = seed.Value
+            };
         }
     }
 }

@@ -6,6 +6,7 @@
 // </copyright>
 
 using Jedi.Common.Api.Clients;
+using Jedi.Common.Contracts.Protocols.User;
 using Jedi.Datastore.Contracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,6 +19,13 @@ namespace Jedi.Common.S2SCommunication
     /// </summary>
     public interface IDatastoreClient
     {
+        /// <summary>
+        /// Attempt a password for an account asynchronously.
+        /// </summary>
+        /// <param name="username">The username of the account.</param>
+        /// <param name="password">The attempted password.</param>
+        /// <returns></returns>
+        public Task<PROTO_USER_PASSWORD_CHECK_ACK> CheckPasswordAsync(string username, string password);
     }
 
     /// <summary>
@@ -41,6 +49,26 @@ namespace Jedi.Common.S2SCommunication
             _logger = logger;
             _serviceClientFactory = serviceClientFactory;
             _datastoreConfiguration = datastoreConfiguration;
+        }
+
+        /// <summary>
+        /// Attempt a password for an account asynchronously.
+        /// </summary>
+        /// <param name="username">The username of the account.</param>
+        /// <param name="password">The attempted password.</param>
+        /// <returns></returns>
+        public async Task<PROTO_USER_PASSWORD_CHECK_ACK> CheckPasswordAsync(string username, string password)
+        {
+            var protocol = new PROTO_USER_PASSWORD_CHECK_REQ
+            {
+                OperationId = Guid.NewGuid(),
+                Username = username,
+                Password = password
+            };
+
+            return await _serviceClientFactory
+                .CreateClient(_datastoreConfiguration.CurrentValue.Client.ServiceEndpoint)
+                .CheckPasswordAsync(protocol);
         }
     }
 }
