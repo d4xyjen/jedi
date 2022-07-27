@@ -52,7 +52,7 @@ namespace Jedi.Common.Api.Clients
         /// This method is used by compiled API's to send messages to
         /// a client asynchronously.
         /// </summary>
-        protected async Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CorrelatedProtocol protocol) where TResponse : CorrelatedProtocol
+        protected async Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, Dto protocol) where TResponse : Dto
         {
             return await SendAsync<TResponse>(command, new CancellationTokenSource(TimeSpan.FromMilliseconds(AsyncConstants.AsyncSendTimeout)).Token, protocol);
         }
@@ -61,7 +61,7 @@ namespace Jedi.Common.Api.Clients
         /// This method is used by compiled API's to send messages to
         /// a client asynchronously with cancellation support.
         /// </summary>
-        protected async Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CancellationToken cancellationToken, CorrelatedProtocol protocol) where TResponse : CorrelatedProtocol
+        protected async Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CancellationToken cancellationToken, Dto protocol) where TResponse : Dto
         {
             try
             {

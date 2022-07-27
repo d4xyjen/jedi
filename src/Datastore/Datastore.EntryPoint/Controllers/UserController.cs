@@ -39,7 +39,7 @@ namespace Jedi.Datastore.EntryPoint.Controllers
         {
             return new PROTO_USER_PASSWORD_CHECK_ACK()
             {
-                OperationId = protocol.OperationId
+                DtoId = protocol.DtoId
             };
         }
     }

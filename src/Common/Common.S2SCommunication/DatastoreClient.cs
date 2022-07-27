@@ -61,7 +61,7 @@ namespace Jedi.Common.S2SCommunication
         {
             var protocol = new PROTO_USER_PASSWORD_CHECK_REQ
             {
-                OperationId = Guid.NewGuid(),
+                DtoId = Guid.NewGuid(),
                 Username = username,
                 Password = password
             };

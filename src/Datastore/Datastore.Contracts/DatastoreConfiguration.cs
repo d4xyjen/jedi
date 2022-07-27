@@ -14,5 +14,9 @@ namespace Jedi.Datastore.Contracts
     /// </summary>
     public class DatastoreConfiguration : ServiceConfiguration
     {
+        /// <summary>
+        /// Configuration for an Sql datastore.
+        /// </summary>
+        public SqlDatastoreConfiguration Sql { get; set; } = new SqlDatastoreConfiguration();
     }
 }

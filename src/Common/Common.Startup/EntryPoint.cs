@@ -18,6 +18,7 @@ using Serilog;
 using Serilog.Events;
 using System.Diagnostics;
 using System.Reflection;
+using Jedi.Common.Contracts;
 
 namespace Jedi.Common.Startup
 {
@@ -89,6 +90,8 @@ namespace Jedi.Common.Startup
 
                 services.AddHostedService<SessionEventProcessor>();
                 services.AddHostedService<SessionAcceptor>();
+
+                services.Configure<SessionConfiguration>(context.Configuration.GetSection(ConfigurationConstants.SessionConfigurationSectionName));
 
                 // Application services
                 services.BuildServiceProvider().GetRequiredService<TStartup>().ConfigureServices(services);

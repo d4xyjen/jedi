@@ -56,7 +56,7 @@ namespace Jedi.Common.Api.Sessions
             _sendThread = new Thread(Send) { IsBackground = true };
             _receiveThread = new Thread(Receive) { IsBackground = true };
             _sendPending = new ManualResetEvent(false);
-            PendingOperations = new ConcurrentDictionary<Guid, CorrelatedProtocol?>();
+            PendingOperations = new ConcurrentDictionary<Guid, Dto?>();
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Jedi.Common.Api.Sessions
         /// The session's pending asynchronous operations.
         /// These are tasks that run until the session receives a correlated protocol.
         /// </summary>
-        public ConcurrentDictionary<Guid, CorrelatedProtocol?> PendingOperations { get; }
+        public ConcurrentDictionary<Guid, Dto?> PendingOperations { get; }
 
         /// <summary>
         /// Start the session.
@@ -181,7 +181,7 @@ namespace Jedi.Common.Api.Sessions
         /// </summary>
         /// <param name="command">The type of protocol to send.</param>
         /// <param name="protocol">The protocol to send.</param>
-        public Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CorrelatedProtocol protocol) where TResponse : CorrelatedProtocol
+        public Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, Dto protocol) where TResponse : Dto
         {
             return SendAsync<TResponse>(command, CancellationToken.None, protocol);
         }
@@ -192,21 +192,21 @@ namespace Jedi.Common.Api.Sessions
         /// <param name="command">The type of protocol to send.</param>
         /// <param name="cancellationToken">Cancellation token used to cancel the operation.</param>
         /// <param name="protocol">The protocol to send.</param>
-        public Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CancellationToken cancellationToken, CorrelatedProtocol protocol) where TResponse : CorrelatedProtocol
+        public Task<TResponse?> SendAsync<TResponse>(ProtocolCommand command, CancellationToken cancellationToken, Dto protocol) where TResponse : Dto
         {
             return Task.Run(async () =>
             {
-                if (!PendingOperations.TryAdd(protocol.OperationId, null))
+                if (!PendingOperations.TryAdd(protocol.DtoId, null))
                 {
                     return null;
                 }
 
                 Send(command, protocol);
 
-                CorrelatedProtocol? response = null;
+                Dto? response = null;
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    if (PendingOperations.TryGetValue(protocol.OperationId, out response) && response != null)
+                    if (PendingOperations.TryGetValue(protocol.DtoId, out response) && response != null)
                     {
                         break;
                     }
@@ -214,7 +214,7 @@ namespace Jedi.Common.Api.Sessions
                     await Task.Delay(10, cancellationToken);
                 }
 
-                PendingOperations.TryRemove(protocol.OperationId, out _);
+                PendingOperations.TryRemove(protocol.DtoId, out _);
                 return (TResponse?) response;
 
             }, cancellationToken);
@@ -432,7 +432,7 @@ namespace Jedi.Common.Api.Sessions
         /// </summary>
         /// <param name="operationId">The operation's identifier.</param>
         /// <param name="response">The response for the operation.</param>
-        public bool CompleteOperation(Guid operationId, CorrelatedProtocol response)
+        public bool CompleteOperation(Guid operationId, Dto response)
         {
             return PendingOperations.TryUpdate(operationId, response, null);
         }

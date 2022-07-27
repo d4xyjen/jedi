@@ -200,7 +200,7 @@ namespace Jedi.Common.Api.Messaging
 
             if (_sessionFactory.GetSession(sessionId, out var session) && session != null)
             {
-                if (protocol is CorrelatedProtocol correlatedProtocol && session.CompleteOperation(correlatedProtocol.OperationId, correlatedProtocol))
+                if (protocol is Dto correlatedProtocol && session.CompleteOperation(correlatedProtocol.DtoId, correlatedProtocol))
                 {
                     // the protocol is part of an operation.
                     //

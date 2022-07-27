@@ -15,5 +15,10 @@ namespace Jedi.Common.Contracts
         /// Configuration for clients of the service.
         /// </summary>
         public ServiceClientConfiguration Client { get; set; } = new ServiceClientConfiguration();
+
+        /// <summary>
+        /// Configuration for sessions of the service.
+        /// </summary>
+        public SessionConfiguration Sessions { get; set; } = new SessionConfiguration();
     }
 }

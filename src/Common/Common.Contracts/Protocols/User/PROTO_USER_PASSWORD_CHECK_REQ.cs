@@ -15,7 +15,7 @@ namespace Jedi.Common.Contracts.Protocols.User
     /// </summary>
     [DataContract]
     [Command(ProtocolCommand.USER_PASSWORD_CHECK_REQ)]
-    public class PROTO_USER_PASSWORD_CHECK_REQ : CorrelatedProtocol
+    public class PROTO_USER_PASSWORD_CHECK_REQ : Dto
     {
         /// <summary>
         /// The account username.

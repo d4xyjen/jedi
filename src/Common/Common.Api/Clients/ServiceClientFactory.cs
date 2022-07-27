@@ -85,12 +85,12 @@ namespace Jedi.Common.Api.Clients
                         typeof(Task).Assembly,
                         typeof(Task<>).Assembly,
                         typeof(Protocol).Assembly,
-                        typeof(CorrelatedProtocol).Assembly
+                        typeof(Dto).Assembly
                     ).WithImports(
                         typeof(Task).Namespace,
                         typeof(Task<>).Namespace,
                         typeof(Protocol).Namespace,
-                        typeof(CorrelatedProtocol).Namespace));
+                        typeof(Dto).Namespace));
                     
                     serviceClientSource.Compile();
 

@@ -5,7 +5,6 @@
 // repository for more information.
 // </copyright>
 
-using Jedi.Common.Contracts;
 using Jedi.Common.Startup;
 
 namespace Jedi.World.EntryPoint
@@ -35,8 +34,6 @@ namespace Jedi.World.EntryPoint
         /// <param name="services">The <see cref="IServiceCollection"/> from the host.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<SessionConfiguration>(_configuration.GetSection("Sessions"));
-
             services.AddHostedService<ServiceWorker>();
         }
     }
